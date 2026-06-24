@@ -731,6 +731,15 @@ def get_knowledge_tree_text():
 # ============ 初始化数据库 & 种子数据 ============
 def init_database():
     """初始化数据库并插入种子知识点"""
+    # 重置数据库（解决迁移冲突）
+    import os
+    db_path = os.path.join(os.path.dirname(__file__), 'instance', 'mathlearn.db')
+    if os.path.exists(db_path):
+        try:
+            os.remove(db_path)
+        except Exception:
+            pass
+
     # 启用 WAL 模式，解决 SQLite 并发写入锁死问题
     from sqlalchemy import text
     db.session.execute(text('PRAGMA journal_mode=WAL'))
@@ -797,7 +806,9 @@ def init_database():
     db.session.add_all(children)
     db.session.commit()
 
+# 确保数据库初始化（本地和 Render 部署都生效）
+with app.app_context():
+    init_database()
+
 if __name__ == '__main__':
-    with app.app_context():
-        init_database()
     app.run(debug=True)
