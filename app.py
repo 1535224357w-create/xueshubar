@@ -27,29 +27,15 @@ def index():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        username = request.form.get('username')
-        email = request.form.get('email')
-        password = request.form.get('password')
+        username = request.form.get('username', '').strip()
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '')
 
-        if User.query.filter_by(username=username).first():
-            flash('用户名已存在')
+        if not username or not email or not password:
+            flash('请填写所有字段')
             return render_template('register.html')
-        if User.query.filter_by(email=email).first():
-            flash('邮箱已注册')
-            return render_template('register.html')
-
-        # 密码强度检查
-        errors = []
         if len(password) < 8:
-            errors.append('密码至少 8 位')
-        if not any(c.isupper() for c in password):
-            errors.append('需包含大写字母')
-        if not any(c.islower() for c in password):
-            errors.append('需包含小写字母')
-        if not any(c.isdigit() for c in password):
-            errors.append('需包含数字')
-        if errors:
-            flash('密码强度不足：' + '、'.join(errors))
+            flash('密码至少 8 位')
             return render_template('register.html')
 
         try:
