@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}上传结果{% endblock %}
+{% block content %}
+<div class="mb-3">
+    <a href="{{ url_for('upload_problem') }}" class="btn btn-outline-primary">继续上传</a>
+    <a href="{{ url_for('my_wrong_problems') }}" class="btn btn-outline-secondary">查看错题本</a>
+</div>
+
+<div class="alert alert-success animate-in">
+    <strong>✅ 错题已保存！</strong> AI 已完成分析。
+</div>
+
+<!-- 题目 -->
+<div class="card mb-4 animate-in">
+    <div class="card-header">
+        <h5 class="mb-0 fw-bold">📝 你的题目</h5>
+    </div>
+    <div class="card-body">
+        <div class="d-flex gap-2 mb-3">
+            {% if problem.knowledge_point %}
+            <span class="badge badge-kp">{{ problem.knowledge_point.name }}</span>
+            {% endif %}
+            {% if problem.tags %}
+                {% for tag in problem.tags.split(',') %}
+                <span class="badge bg-light text-dark">{{ tag.strip() }}</span>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="problem-content">
+            {{ problem.content }}
+        </div>
+    </div>
+</div>
+
+{% if solution %}
+<!-- 第一部分：解题过程 -->
+<div class="card mb-4 animate-in border-warning border-start">
+    <div class="card-header bg-warning bg-opacity-10">
+        <h5 class="mb-0 fw-bold">📖 解题过程</h5>
+    </div>
+    <div class="card-body">
+        <div class="solution-content" style="line-height: 1.9; white-space: pre-wrap;">{{ solution|safe }}</div>
+    </div>
+</div>
+{% endif %}
+
+{% if answer_text %}
+<!-- 第二部分：答案 -->
+<div class="card mb-4 animate-in border-success border-start">
+    <div class="card-header bg-success bg-opacity-10">
+        <h5 class="mb-0 fw-bold">✅ 答案</h5>
+    </div>
+    <div class="card-body">
+        <div class="fs-5 fw-bold text-success">{{ answer_text }}</div>
+    </div>
+</div>
+{% endif %}
+
+<!-- 相似题推荐 -->
+<div class="card animate-in" style="animation-delay: 0.15s;">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold">🎯 相似题推荐</h5>
+        <span class="badge bg-primary">{{ similar|length }} 道</span>
+    </div>
+    <div class="card-body">
+        {% if similar %}
+        <p class="text-muted">以下是与你的错题相似的题目，建议练习巩固：</p>
+        <div class="row g-3">
+            {% for s in similar %}
+            <div class="col-md-6">
+                <div class="card problem-card h-100 border-primary border-start">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="badge badge-kp">{{ s.knowledge_point.name }}</span>
+                            <span class="difficulty-stars">
+                                {% for _ in range(s.difficulty) %}★{% endfor %}
+                            </span>
+                        </div>
+                        <div class="problem-content mb-2 small">
+                            {{ s.content }}
+                        </div>
+                        <a href="{{ url_for('problem_detail', problem_id=s.id) }}"
+                           class="btn btn-sm btn-outline-primary">查看详解 →</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state py-3">
+            <p class="mb-0">暂无相似题目推荐，题库还在建设中</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

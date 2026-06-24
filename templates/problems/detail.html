@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}题目详情{% endblock %}
+{% block content %}
+<div class="mb-3">
+    <a href="{{ url_for('problem_list') }}" class="text-decoration-none text-muted">
+        ← 返回题目库
+    </a>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+                <span class="badge badge-kp fs-6">{{ problem.knowledge_point.name }}</span>
+                {% if problem.tags %}
+                    {% for tag in problem.tags.split(',') %}
+                    <span class="badge bg-light text-dark me-1">{{ tag.strip() }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <span class="difficulty-stars fs-5">
+                {% for _ in range(problem.difficulty) %}★{% endfor %}
+                {% for _ in range(5 - problem.difficulty) %}☆{% endfor %}
+            </span>
+        </div>
+
+        <h5 class="fw-bold">📝 题目</h5>
+        <div class="problem-content mb-4">
+            {{ problem.content }}
+        </div>
+
+        <div class="mb-3">
+            <button class="btn btn-accent" onclick="toggleAnswer()">
+                📖 查看答案与解析
+            </button>
+        </div>
+
+        <div id="answerSection" style="display: none;">
+            <h5 class="fw-bold mt-4">✅ 答案</h5>
+            <div class="problem-content mb-3">
+                {{ problem.answer or '暂无答案' }}
+            </div>
+            <h5 class="fw-bold">📖 解析</h5>
+            <div class="problem-content">
+                {{ problem.explanation or '暂无解析' }}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if current_user.is_authenticated %}
+<div class="card">
+    <div class="card-body">
+        <h5 class="fw-bold">📕 加入错题本</h5>
+        <form method="POST" action="{{ url_for('upload_problem') }}">
+            <input type="hidden" name="content" value="{{ problem.content }}">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" name="user_answer" class="form-control" placeholder="你的答案（选填）">
+                </div>
+                <div class="col-md-6">
+                    <input type="text" name="note" class="form-control" placeholder="错在哪了？（选填）">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-warning w-100">加入</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+<script>
+function toggleAnswer() {
+    const section = document.getElementById('answerSection');
+    section.style.display = section.style.display === 'none' ? 'block' : 'none';
+}
+</script>
+{% endblock %}

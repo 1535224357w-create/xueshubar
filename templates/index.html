@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% block title %}学数 bar - 首页{% endblock %}
+{% block content %}
+
+<!-- Hero 区域 -->
+<div class="hero-section">
+    <div class="container">
+        <h1 class="hero-title">用 AI 征服数学</h1>
+        <p class="hero-subtitle">
+            上传你的错题，AI 自动分析知识点、推荐相似题目。
+            从极限到微分方程，系统化学习高数。
+        </p>
+        <div class="mt-4">
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('upload_problem') }}" class="btn btn-accent btn-lg me-2">
+                📤 上传第一道错题
+            </a>
+            <a href="{{ url_for('problem_list') }}" class="btn btn-outline-light btn-lg">
+                📖 浏览题目库
+            </a>
+            {% else %}
+            <a href="{{ url_for('register') }}" class="btn btn-accent btn-lg me-2">
+                🚀 免费注册开始学习
+            </a>
+            <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">
+                登录
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- 特色功能 -->
+<div class="row g-4">
+    <div class="col-md-4 animate-in">
+        <div class="feature-card">
+            <div class="icon">📚</div>
+            <h5>系统题目库</h5>
+            <p>按知识点精心整理的数学题目，从基础到进阶，覆盖核心考点。</p>
+            <a href="{{ url_for('problem_list') }}" class="btn btn-outline-primary mt-2">浏览题目</a>
+        </div>
+    </div>
+    <div class="col-md-4 animate-in">
+        <div class="feature-card">
+            <div class="icon">🤖</div>
+            <h5>AI 智能分析</h5>
+            <p>拍照或输入你的错题，AI 自动识别知识点、生成解析、推荐同类题目。</p>
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('upload_photo') }}" class="btn btn-outline-primary mt-2">拍照上传</a>
+            {% else %}
+            <a href="{{ url_for('register') }}" class="btn btn-outline-primary mt-2">注册使用</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-md-4 animate-in">
+        <div class="feature-card">
+            <div class="icon">🎯</div>
+            <h5>精准强化</h5>
+            <p>做错的题不再放过——AI 推荐相似题反复练习，直到真正掌握。</p>
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('my_wrong_problems') }}" class="btn btn-outline-primary mt-2">我的错题本</a>
+            {% else %}
+            <a href="{{ url_for('register') }}" class="btn btn-outline-primary mt-2">开始学习</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- 覆盖知识点 -->
+<div class="row mt-5 pt-3">
+    <div class="col-12 text-center mb-4">
+        <h4 class="fw-bold">📐 覆盖数学核心内容</h4>
+        <p class="text-muted">从大学一年级到考研，系统化学习路径</p>
+    </div>
+    {% set subjects = [
+        ('一元微积分', '极限、导数、积分', '🔵'),
+        ('多元微积分', '偏导数、重积分', '🟠'),
+        ('线性代数', '矩阵、行列式', '🟢'),
+        ('概率统计', '概率、分布、估计', '🔴'),
+        ('常微分方程', '一阶、二阶方程', '🟣')
+    ] %}
+    {% for name, desc, icon in subjects %}
+    <div class="col-md-4 col-lg mb-3">
+        <div class="subject-tag animate-in" style="animation-delay: {{ 0.1 * loop.index0 }}s;">
+            <div class="fs-3 mb-1">{{ icon }}</div>
+            <h6 class="fw-bold mb-0">{{ name }}</h6>
+            <small class="text-muted">{{ desc }}</small>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- 新功能开发中 -->
+<div class="row mt-5 pt-3">
+    <div class="col-12 text-center mb-4">
+        <h4 class="fw-bold">🚧 新功能开发中</h4>
+        <p class="text-muted">即将上线，敬请期待</p>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card h-100 text-center p-4" style="border: 2px dashed #d0d4e0 !important; background: #fafbfc;">
+            <div class="fs-1 mb-2">📊</div>
+            <h6 class="fw-bold">学习数据统计</h6>
+            <small class="text-muted">查看你的学习进度、正确率趋势、薄弱知识点</small>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card h-100 text-center p-4" style="border: 2px dashed #d0d4e0 !important; background: #fafbfc;">
+            <div class="fs-1 mb-2">🗓️</div>
+            <h6 class="fw-bold">智能复习计划</h6>
+            <small class="text-muted">基于遗忘曲线自动安排复习，巩固薄弱点</small>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card h-100 text-center p-4" style="border: 2px dashed #d0d4e0 !important; background: #fafbfc;">
+            <div class="fs-1 mb-2">🏆</div>
+            <h6 class="fw-bold">每日挑战</h6>
+            <small class="text-muted">每天一道精选题目，打卡学习，持续进步</small>
+        </div>
+    </div>
+</div>
+
+<!-- 意见反馈 -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body p-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h5 class="fw-bold mb-1">💬 意见反馈</h5>
+                        <p class="text-muted mb-0 small">你的每一条建议都是产品进步的动力</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <button class="btn btn-outline-primary" onclick="document.getElementById('feedbackModal').style.display='block'">📝 提意见</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 反馈弹窗 -->
+<div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:9999; padding-top:100px;">
+    <div class="bg-white rounded p-4 mx-auto" style="max-width:500px; box-shadow:0 10px 40px rgba(0,0,0,0.2);">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0">💬 意见反馈</h5>
+            <button class="btn-close" onclick="document.getElementById('feedbackModal').style.display='none'"></button>
+        </div>
+        <form id="feedbackForm">
+            <div class="mb-3">
+                <textarea id="feedbackContent" class="form-control" rows="4" placeholder="请写下你的建议、问题或想法..." required></textarea>
+            </div>
+            <div id="feedbackStatus" class="mb-2 small"></div>
+            <button type="submit" class="btn btn-primary w-100" id="feedbackBtn">发送反馈</button>
+        </form>
+    </div>
+</div>
+
+<script>
+document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var content = document.getElementById('feedbackContent').value.trim();
+    if (!content) return;
+    var btn = document.getElementById('feedbackBtn');
+    var status = document.getElementById('feedbackStatus');
+    btn.disabled = true;
+    btn.textContent = '发送中...';
+    fetch('/api/feedback', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({content: content})
+    }).then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.success) {
+            status.innerHTML = '<span class="text-success">✅ 感谢你的反馈！</span>';
+            document.getElementById('feedbackContent').value = '';
+            setTimeout(function() {
+                document.getElementById('feedbackModal').style.display = 'none';
+                status.innerHTML = '';
+            }, 2000);
+        } else {
+            status.innerHTML = '<span class="text-danger">发送失败，请稍后重试</span>';
+        }
+    }).catch(function() {
+        status.innerHTML = '<span class="text-danger">网络错误</span>';
+    }).finally(function() {
+        btn.disabled = false;
+        btn.textContent = '发送反馈';
+    });
+});
+</script>
+{% endblock %}

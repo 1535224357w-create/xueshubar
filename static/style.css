@@ -1,0 +1,282 @@
+/* ============================================
+   学数 bar - 精致版
+   保留学术蓝主题，优化小元素细节
+   ============================================ */
+
+:root {
+    --primary: #1a237e;
+    --primary-light: #283593;
+    --primary-dark: #0d1452;
+    --accent: #ff6f00;
+    --accent-light: #ffa040;
+    --bg: #f0f2f5;
+    --bg-card: #ffffff;
+    --text: #1a1a2e;
+    --text-muted: #6b7280;
+    --border: #e5e7eb;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-lg: 16px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei',
+                 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main.container { flex: 1; padding-top: 1.5rem; padding-bottom: 2.5rem; }
+
+/* KaTeX */
+.katex { font-size: 1.15em !important; }
+
+/* ========== 导航栏 ========== */
+.navbar {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary)) !important;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    padding: 0.5rem 0;
+}
+.navbar-brand {
+    font-weight: 800;
+    font-size: 1.25rem;
+    letter-spacing: 0.5px;
+    background: rgba(255,255,255,0.1);
+    padding: 0.3rem 1rem;
+    border-radius: 8px;
+}
+.navbar .nav-link {
+    padding: 0.5rem 1rem !important;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+.navbar .nav-link:hover { background: rgba(255,255,255,0.12); }
+.navbar .nav-link.active { background: rgba(255,255,255,0.18); font-weight: 600; }
+
+/* ========== Hero ========== */
+.hero-section {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%);
+    color: white; padding: 5rem 0 4rem; margin: -1.5rem 0 3rem;
+    position: relative; overflow: hidden;
+    border-radius: 0 0 24px 24px;
+}
+.hero-section::after {
+    content: '∑ ∫ ∞ π'; position: absolute; bottom: -20px; right: 5%;
+    font-size: 8rem; opacity: 0.04; font-weight: 700; letter-spacing: 20px;
+    pointer-events: none;
+}
+.hero-title { font-size: 2.8rem; font-weight: 800; margin-bottom: 1rem; line-height: 1.2; }
+.hero-subtitle { font-size: 1.15rem; opacity: 0.85; max-width: 600px; line-height: 1.8; }
+
+/* ========== 卡片系统 ========== */
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    transition: all 0.25s ease;
+    overflow: hidden;
+}
+.card:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+    border-color: #d0d4e0 !important;
+}
+.card-header {
+    background: transparent;
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+}
+.card-body { padding: 1.5rem; }
+
+/* 特色卡片（首页） */
+.feature-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    height: 100%;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.feature-card:hover {
+    box-shadow: 0 12px 35px rgba(0,0,0,0.1);
+    transform: translateY(-6px);
+    border-color: var(--primary-light);
+}
+.feature-card .icon { font-size: 3rem; margin-bottom: 1rem; }
+
+/* 题目卡片 */
+.problem-card {
+    border-left: 4px solid var(--primary) !important;
+    border-radius: var(--radius-lg) !important;
+}
+.problem-card:hover { border-left-color: var(--accent) !important; }
+
+/* 带颜色边框的卡片 */
+.card.border-warning { border-left: 4px solid #f59e0b !important; }
+.card.border-success { border-left: 4px solid #22c55e !important; }
+.card.border-info { border-left: 4px solid #3b82f6 !important; }
+.card.border-primary { border-left: 4px solid var(--primary) !important; }
+
+/* ========== 题目内容 ========== */
+.problem-content {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    padding: 1.2rem;
+    background: linear-gradient(135deg, #f8f9fc 0%, #f0f2f8 100%);
+    border-radius: 10px;
+    border: 1px solid #eef0f5;
+}
+
+/* ========== 解题内容 ========== */
+.solution-content { line-height: 1.9; white-space: pre-wrap; font-size: 0.95rem; }
+.solution-content img {
+    max-width: 100%; height: auto; margin: 1rem 0;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* ========== 难度星星 ========== */
+.difficulty-stars { color: #f59e0b; letter-spacing: 3px; font-size: 0.85rem; }
+
+/* ========== 按钮 ========== */
+.btn {
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 0.5rem 1.2rem;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+.btn-primary {
+    background: var(--primary);
+    border: none;
+    box-shadow: 0 2px 8px rgba(26,35,126,0.2);
+}
+.btn-primary:hover {
+    background: var(--primary-light);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(26,35,126,0.3);
+}
+.btn-accent {
+    background: var(--accent);
+    border: none;
+    color: white;
+    box-shadow: 0 2px 8px rgba(255,111,0,0.2);
+}
+.btn-accent:hover {
+    background: var(--accent-light);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255,111,0,0.3);
+}
+.btn-outline-primary {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+.btn-outline-primary:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+}
+.btn-lg { padding: 0.7rem 1.5rem; font-size: 1rem; }
+.btn-sm { padding: 0.3rem 0.8rem; font-size: 0.8rem; border-radius: 6px; }
+
+/* ========== Badge / 标签 ========== */
+.badge { font-weight: 500; padding: 0.3em 0.7em; border-radius: 6px; font-size: 0.8rem; }
+.badge-kp { background: #e8eaf6; color: var(--primary); }
+
+/* ========== 知识树 ========== */
+.kp-node { border-left: 3px solid var(--primary-light); padding-left: 1rem; margin-bottom: 0.5rem; }
+.kp-node-parent {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s;
+}
+.kp-node-parent:hover { border-color: var(--primary-light); box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+
+/* ========== 空状态 ========== */
+.empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-muted); }
+.empty-state .icon { font-size: 4rem; margin-bottom: 1rem; opacity: 0.5; }
+
+/* ========== 页脚 ========== */
+.footer {
+    background: var(--primary-dark);
+    color: rgba(255,255,255,0.7);
+    padding: 1.5rem 0;
+    margin-top: auto;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+/* ========== 认证卡片 ========== */
+.auth-card { max-width: 420px; margin: 3rem auto; }
+.auth-card .card { box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
+
+/* ========== 知识概览标签 ========== */
+.subject-tag {
+    display: inline-block;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    background: white;
+    border: 1px solid var(--border);
+    text-align: center;
+    transition: all 0.2s;
+    width: 100%;
+}
+.subject-tag:hover {
+    border-color: var(--primary-light);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+}
+
+/* ========== 动画 ========== */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+.animate-in { animation: fadeInUp 0.5s ease both; }
+.animate-in:nth-child(2) { animation-delay: 0.1s; }
+.animate-in:nth-child(3) { animation-delay: 0.2s; }
+
+/* ========== Alert 消息 ========== */
+.alert {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* ========== 表单 ========== */
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    padding: 0.6rem 1rem;
+    transition: all 0.2s;
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(26,35,126,0.1);
+}
+
+/* ========== 响应式 ========== */
+@media (max-width: 768px) {
+    .hero-title { font-size: 1.8rem; }
+    .hero-section { padding: 3rem 0 2.5rem; margin: -1.5rem -0.75rem 2rem; border-radius: 0; }
+    .hero-section::after { display: none; }
+}

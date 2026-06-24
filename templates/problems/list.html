@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}题目库{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">📖 题目库</h2>
+        <p class="text-muted mb-0">按知识点浏览系统题目，共 {{ problems|length }} 道</p>
+    </div>
+</div>
+
+<!-- 筛选 -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form class="row g-3 align-items-end" method="GET">
+            <div class="col-md-5">
+                <label class="form-label fw500">知识点</label>
+                <select name="kp_id" class="form-select">
+                    <option value="">全部知识点</option>
+                    {% for kp in knowledge_points %}
+                    <option value="{{ kp.id }}" {% if request.args.get('kp_id')|string == kp.id|string %}selected{% endif %}>
+                        {{ kp.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw500">难度</label>
+                <select name="difficulty" class="form-select">
+                    <option value="">全部</option>
+                    <option value="1" {% if request.args.get('difficulty')|string == '1' %}selected{% endif %}>★ 简单</option>
+                    <option value="2" {% if request.args.get('difficulty')|string == '2' %}selected{% endif %}>★★</option>
+                    <option value="3" {% if request.args.get('difficulty')|string == '3' %}selected{% endif %}>★★★ 中等</option>
+                    <option value="4" {% if request.args.get('difficulty')|string == '4' %}selected{% endif %}>★★★★</option>
+                    <option value="5" {% if request.args.get('difficulty')|string == '5' %}selected{% endif %}>★★★★★ 困难</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">筛选</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 题目列表 -->
+{% if problems %}
+<div class="row g-3">
+    {% for problem in problems %}
+    <div class="col-md-6 animate-in" style="animation-delay: {{ 0.05 * loop.index0 }}s;">
+        <div class="card problem-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="badge badge-kp">{{ problem.knowledge_point.name }}</span>
+                    <span class="difficulty-stars">
+                        {% for _ in range(problem.difficulty) %}★{% endfor %}
+                        {% for _ in range(5 - problem.difficulty) %}☆{% endfor %}
+                    </span>
+                </div>
+                <div class="problem-content mb-3">
+                    {{ problem.content }}
+                </div>
+                <a href="{{ url_for('problem_detail', problem_id=problem.id) }}"
+                   class="btn btn-sm btn-outline-primary">
+                    查看详解 →
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="icon">📭</div>
+    <h5>暂未找到题目</h5>
+    <p>换个筛选条件试试，或者先添加一些题目</p>
+    <a href="{{ url_for('problem_list') }}" class="btn btn-outline-primary">清除筛选</a>
+</div>
+{% endif %}
+{% endblock %}

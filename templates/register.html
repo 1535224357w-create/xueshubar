@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}注册{% endblock %}
+{% block content %}
+<div class="auth-card">
+    <div class="card">
+        <div class="card-body p-4">
+            <h3 class="text-center mb-1 fw-bold">📐 开始学习</h3>
+            <p class="text-center text-muted mb-4">注册学数 bar，用 AI 提升高数</p>
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label">用户名</label>
+                    <input type="text" name="username" class="form-control form-control-lg" required
+                           placeholder="给自己取个名字">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">邮箱</label>
+                    <input type="email" name="email" class="form-control form-control-lg" required
+                           placeholder="your@email.com">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">密码</label>
+                    <input type="password" name="password" class="form-control form-control-lg" required
+                           placeholder="至少6位密码">
+                </div>
+                <button type="submit" class="btn btn-primary w-100 btn-lg">🚀 注册</button>
+            </form>
+            <p class="text-center mt-3 mb-0 text-muted">
+                已有账号？<a href="{{ url_for('login') }}" class="fw-bold">登录</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

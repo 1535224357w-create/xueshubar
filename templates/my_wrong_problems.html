@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}我的错题本{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">📕 我的错题本</h2>
+        <p class="text-muted mb-0">共 {{ records|length }} 道错题记录</p>
+    </div>
+    <a href="{{ url_for('upload_problem') }}" class="btn btn-primary">📤 添加错题</a>
+</div>
+
+{% if records %}
+<div class="row g-3">
+    {% for record in records %}
+    <div class="col-md-6 animate-in" style="animation-delay: {{ 0.05 * loop.index0 }}s;">
+        <div class="card problem-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                        <span class="badge badge-kp">
+                            {{ record.problem.knowledge_point.name if record.problem.knowledge_point else '未分类' }}
+                        </span>
+                        {% if record.problem.difficulty %}
+                        <span class="difficulty-stars ms-1">
+                            {% for _ in range(record.problem.difficulty) %}★{% endfor %}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <small class="text-muted">{{ record.created_at.strftime('%m-%d %H:%M') }}</small>
+                </div>
+                <div class="problem-content mb-2">
+                    {{ record.problem.content }}
+                </div>
+                {% if record.user_answer %}
+                <div class="mb-2">
+                    <small class="text-danger fw500">✗ 你的答案：{{ record.user_answer }}</small>
+                </div>
+                {% endif %}
+                {% if record.note %}
+                <div class="mb-2">
+                    <small class="text-muted">📌 {{ record.note }}</small>
+                </div>
+                {% endif %}
+                <a href="{{ url_for('problem_detail', problem_id=record.problem.id) }}"
+                   class="btn btn-sm btn-accent">查看解析 →</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="icon">📭</div>
+    <h5>还没有错题记录</h5>
+    <p>开始学习后，做错的题会自动记录在这里</p>
+    <a href="{{ url_for('upload_problem') }}" class="btn btn-primary">上传第一道错题</a>
+</div>
+{% endif %}
+{% endblock %}
