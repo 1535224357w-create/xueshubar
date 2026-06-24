@@ -473,47 +473,101 @@ def create_order():
     # 构造支付订单号
     out_trade_no = f'XS{order.id:06d}{uuid.uuid4().hex[:8]}'
 
-    # 调用 PayJS API
-    mchid = app.config.get('PAYJS_MCHID', '')
-    key = app.config.get('PAYJS_KEY', '')
-    notify_url = app.config.get('PAYJS_NOTIFY_URL', '')
-
-    if mchid and key:
+    # 支付宝当面付
+    app_id = app.config.get('ALIPAY_APP_ID', '')
+    if app_id:
         try:
-            import hashlib
-            sign_str = f'amount={amount}&mchid={mchid}&notify_url={notify_url}&out_trade_no={out_trade_no}&key={key}'
-            sign = hashlib.md5(sign_str.encode()).hexdigest().upper()
+            from alipay import AliPay
+            import os
+            alipay_private_key_path = os.path.join(os.path.dirname(__file__), 'alipay_private_key.pem')
+            alipay_public_key_path = os.path.join(os.path.dirname(__file__), 'alipay_public_key.pem')
 
-            pay_resp = requests.post('https://payjs.cn/api/native', json={
-                'mchid': mchid,
-                'total_fee': amount,
-                'out_trade_no': out_trade_no,
-                'notify_url': notify_url,
-                'sign': sign,
-            }, timeout=10)
-            pay_data = pay_resp.json()
+            with open(alipay_private_key_path) as f:
+                private_key = f.read()
+            with open(alipay_public_key_path) as f:
+                public_key = f.read()
 
-            if pay_data.get('return_code') == 1:
-                order.payjs_order_id = pay_data.get('payjs_order_id', '')
+            alipay = AliPay(
+                appid=app_id,
+                app_notify_url=app.config.get('ALIPAY_NOTIFY_URL', ''),
+                app_private_key_string=private_key,
+                alipay_public_key_string=public_key,
+                sign_type='RSA2',
+            )
+
+            # 当面付 - 预下单生成二维码
+            result = alipay.api_alipay_trade_precreate(
+                subject='学数 bar VIP 会员',
+                out_trade_no=out_trade_no,
+                total_amount=amount / 100,  # 元
+            )
+
+            if result.get('code') == '10000':
+                order.payjs_order_id = out_trade_no
                 db.session.commit()
                 return jsonify({
-                    'qrcode': pay_data.get('qrcode', ''),
+                    'qrcode': result.get('qr_code', ''),
                     'order_id': order.id,
                 })
         except Exception:
             pass
 
-    # 未配置 PayJS 时返回模拟二维码
+    # 未配置支付宝时返回模拟二维码
     order.payjs_order_id = 'sim_' + out_trade_no
     db.session.commit()
 
-    # 生成一个简单的模拟二维码
     import base64
     qr_data = f'pay:sim:{out_trade_no}'
     qr_b64 = base64.b64encode(qr_data.encode()).decode()
     fake_qr = f'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={qr_b64}'
 
     return jsonify({'qrcode': fake_qr, 'order_id': order.id})
+
+
+# ============ 支付宝回调通知 ============
+@app.route('/api/alipay/notify', methods=['POST'])
+def alipay_notify():
+    """支付宝支付结果回调"""
+    from alipay import AliPay
+    import os
+    try:
+        with open(os.path.join(os.path.dirname(__file__), 'alipay_private_key.pem')) as f:
+            private_key = f.read()
+        with open(os.path.join(os.path.dirname(__file__), 'alipay_public_key.pem')) as f:
+            public_key = f.read()
+
+        alipay = AliPay(
+            appid=app.config['ALIPAY_APP_ID'],
+            app_notify_url='',
+            app_private_key_string=private_key,
+            alipay_public_key_string=public_key,
+            sign_type='RSA2',
+        )
+
+        data = request.form.to_dict()
+        signature = data.pop('sign', '')
+        if alipay.verify(data, signature):
+            out_trade_no = data.get('out_trade_no', '')
+            trade_status = data.get('trade_status', '')
+            if trade_status == 'TRADE_SUCCESS' and out_trade_no:
+                from models import Order
+                order = Order.query.filter_by(payjs_order_id=out_trade_no).first()
+                if order and order.status == 'pending':
+                    from datetime import datetime, timezone, timedelta
+                    order.status = 'paid'
+                    order.paid_at = datetime.now(timezone.utc)
+                    durations = {'monthly': 30, 'quarterly': 90, 'yearly': 365}
+                    days = durations.get(order.plan, 30)
+                    user = db.session.get(__import__('models').User, order.user_id)
+                    if user:
+                        if user.vip_expiry and user.vip_expiry > datetime.now(timezone.utc):
+                            user.vip_expiry += timedelta(days=days)
+                        else:
+                            user.vip_expiry = datetime.now(timezone.utc) + timedelta(days=days)
+                    db.session.commit()
+        return 'success'
+    except Exception:
+        return 'fail'
 
 
 @app.route('/api/vip/check-order')
