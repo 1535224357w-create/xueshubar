@@ -2,7 +2,7 @@
 {% block title %}拍照上传错题{% endblock %}
 {% block content %}
 <div class="mb-4">
-    <h2 class="fw-bold mb-1">📸 拍照上传</h2>
+    <h2 class="fw-bold mb-1">◉ 拍照上传</h2>
     <p class="text-muted mb-0">拍照或选择图片，AI 自动识别题目</p>
 </div>
 
@@ -22,17 +22,17 @@
                 <!-- 上传区域 -->
                 <div id="uploadArea">
                     <div class="border-2 rounded p-5" style="border: 2px dashed var(--border); background: #f8f9fc;">
-                        <div class="display-4 mb-3">📷</div>
+                        <div class="display-4 mb-3">◎</div>
                         <h5 class="fw-bold">选择题目图片</h5>
                         <p class="text-muted small mb-3">支持 JPG / PNG 格式</p>
                         <div class="d-flex justify-content-center gap-2">
                             <label class="btn btn-primary btn-lg">
-                                📸 拍照
+                                ◉ 拍照
                                 <input type="file" id="cameraInput" accept="image/*" capture="environment"
                                        style="display: none;" onchange="handleFileSelect(event)">
                             </label>
                             <label class="btn btn-outline-primary btn-lg">
-                                📁 选图
+                                ⊓ 选图
                                 <input type="file" id="fileInput" accept="image/*"
                                        style="display: none;" onchange="handleFileSelect(event)">
                             </label>
@@ -43,7 +43,7 @@
                 <!-- 识别按钮 -->
                 <div id="ocrBtnArea" style="display: none;" class="mt-3">
                     <button class="btn btn-accent btn-lg w-100" onclick="doOCR()" id="ocrBtn">
-                        🔍 识别题目
+                        ⊙ 识别题目
                     </button>
                     <div id="ocrSpinner" style="display: none;" class="mt-3">
                         <div class="spinner-border text-primary" role="status"></div>
@@ -58,7 +58,7 @@
     <div class="col-md-6">
         <div class="card h-100">
             <div class="card-body p-4">
-                <h5 class="fw-bold mb-3">📝 识别结果</h5>
+                <h5 class="fw-bold mb-3">§ 识别结果</h5>
                 <form method="POST" action="{{ url_for('upload_problem') }}">
                     <div class="mb-3">
                         <textarea name="content" id="ocrResult" class="form-control" rows="5"
@@ -70,7 +70,7 @@
                     <!-- 识别结果预览 -->
                     <div id="previewBox" class="mb-3 p-3 bg-light rounded border"
                          style="display: none; min-height: 60px;">
-                        <small class="text-muted">👁️ 识别到的题目：</small>
+                        <small class="text-muted">⊙ 识别到的题目：</small>
                         <div id="previewContent" class="mt-1 fs-5 fw-bold"></div>
                     </div>
 
@@ -81,9 +81,9 @@
                         <small class="text-muted">使用引擎：<span id="engineBadge" class="badge bg-info"></span></small>
                     </div>
                     <div class="d-flex justify-content-between align-items-center">
-                        <small class="text-muted">💡 结果可修改，下方实时预览公式效果</small>
+                        <small class="text-muted">○ 结果可修改，下方实时预览公式效果</small>
                         <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" disabled>
-                            📤 提交错题
+                            ↑ 提交错题
                         </button>
                     </div>
                 </form>

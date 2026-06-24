@@ -7,13 +7,13 @@
 </div>
 
 <div class="alert alert-success animate-in">
-    <strong>✅ 错题已保存！</strong> AI 已完成分析。
+    <strong>✓ 错题已保存！</strong> AI 已完成分析。
 </div>
 
 <!-- 题目 -->
 <div class="card mb-4 animate-in">
     <div class="card-header">
-        <h5 class="mb-0 fw-bold">📝 你的题目</h5>
+        <h5 class="mb-0 fw-bold">§ 你的题目</h5>
     </div>
     <div class="card-body">
         <div class="d-flex gap-2 mb-3">
@@ -36,7 +36,7 @@
 <!-- 第一部分：解题过程 -->
 <div class="card mb-4 animate-in border-warning border-start">
     <div class="card-header bg-warning bg-opacity-10">
-        <h5 class="mb-0 fw-bold">📖 解题过程</h5>
+        <h5 class="mb-0 fw-bold">≡ 解题过程</h5>
     </div>
     <div class="card-body">
         <div class="solution-content" style="line-height: 1.9; white-space: pre-wrap;">{{ solution|safe }}</div>
@@ -48,7 +48,7 @@
 <!-- 第二部分：答案 -->
 <div class="card mb-4 animate-in border-success border-start">
     <div class="card-header bg-success bg-opacity-10">
-        <h5 class="mb-0 fw-bold">✅ 答案</h5>
+        <h5 class="mb-0 fw-bold">✓ 答案</h5>
     </div>
     <div class="card-body">
         <div class="fs-5 fw-bold text-success">{{ answer_text }}</div>
@@ -59,7 +59,7 @@
 <!-- 相似题推荐 -->
 <div class="card animate-in" style="animation-delay: 0.15s;">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 fw-bold">🎯 相似题推荐</h5>
+        <h5 class="mb-0 fw-bold">⊚ 相似题推荐</h5>
         <span class="badge bg-primary">{{ similar|length }} 道</span>
     </div>
     <div class="card-body">

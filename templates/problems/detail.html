@@ -24,23 +24,23 @@
             </span>
         </div>
 
-        <h5 class="fw-bold">📝 题目</h5>
+        <h5 class="fw-bold">§ 题目</h5>
         <div class="problem-content mb-4">
             {{ problem.content }}
         </div>
 
         <div class="mb-3">
             <button class="btn btn-accent" onclick="toggleAnswer()">
-                📖 查看答案与解析
+                ≡ 查看答案与解析
             </button>
         </div>
 
         <div id="answerSection" style="display: none;">
-            <h5 class="fw-bold mt-4">✅ 答案</h5>
+            <h5 class="fw-bold mt-4">✓ 答案</h5>
             <div class="problem-content mb-3">
                 {{ problem.answer or '暂无答案' }}
             </div>
-            <h5 class="fw-bold">📖 解析</h5>
+            <h5 class="fw-bold">≡ 解析</h5>
             <div class="problem-content">
                 {{ problem.explanation or '暂无解析' }}
             </div>
@@ -51,7 +51,7 @@
 {% if current_user.is_authenticated %}
 <div class="card">
     <div class="card-body">
-        <h5 class="fw-bold">📕 加入错题本</h5>
+        <h5 class="fw-bold">⊢ 加入错题本</h5>
         <form method="POST" action="{{ url_for('upload_problem') }}">
             <input type="hidden" name="content" value="{{ problem.content }}">
             <div class="row g-3">

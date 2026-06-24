@@ -3,7 +3,7 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h2 class="fw-bold mb-1">📤 上传错题</h2>
+        <h2 class="fw-bold mb-1">↑ 上传错题</h2>
         <p class="text-muted mb-0">
             AI 会分析知识点并推荐相似题
             {% if not current_user.is_vip %}
@@ -12,9 +12,9 @@
         </p>
     </div>
     {% if current_user.is_vip %}
-    <a href="{{ url_for('upload_photo') }}" class="btn btn-outline-primary">📸 拍照上传</a>
+    <a href="{{ url_for('upload_photo') }}" class="btn btn-outline-primary">◉ 拍照上传</a>
     {% else %}
-    <a href="{{ url_for('vip_page') }}" class="btn btn-outline-warning">💎 开通会员解锁拍照</a>
+    <a href="{{ url_for('vip_page') }}" class="btn btn-outline-warning">◆ 开通会员解锁拍照</a>
     {% endif %}
     </a>
 </div>
@@ -30,7 +30,7 @@
                             placeholder="在此输入题目内容，支持 LaTeX 公式&#10;例如：求极限 $\lim_{x \to 0} \frac{\sin x}{x}$"
                             style="font-family: 'Courier New', monospace; font-size: 0.95rem;">{{ initial_content }}</textarea>
                         <div class="form-text">
-                            💡 数学公式用 <code>$...$</code> 括起来
+                            ○ 数学公式用 <code>$...$</code> 括起来
                         </div>
                     </div>
                     <div class="row g-3 mb-3">
@@ -44,7 +44,7 @@
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary btn-lg">
-                        🤖 提交并分析
+                        ∇ 提交并分析
                     </button>
                 </form>
             </div>
@@ -54,7 +54,7 @@
     <div class="col-lg-4">
         <div class="card">
             <div class="card-body">
-                <h5 class="fw-bold mb-3">📝 LaTeX 小抄</h5>
+                <h5 class="fw-bold mb-3">§ LaTeX 小抄</h5>
                 <table class="table table-sm table-borderless">
                     <tr><td><code>\frac{a}{b}</code></td><td>$\frac{a}{b}$</td></tr>
                     <tr><td><code>\lim_{x \to 0}</code></td><td>$\lim_{x \to 0}$</td></tr>
@@ -68,9 +68,9 @@
 
         <div class="card mt-3">
             <div class="card-body">
-                <h5 class="fw-bold mb-2">💡 提示</h5>
+                <h5 class="fw-bold mb-2">○ 提示</h5>
                 <small class="text-muted">
-                    也可以用 <a href="{{ url_for('upload_photo') }}">📸 拍照上传</a>，
+                    也可以用 <a href="{{ url_for('upload_photo') }}">◉ 拍照上传</a>，
                     自动识别题目，更方便。
                 </small>
             </div>

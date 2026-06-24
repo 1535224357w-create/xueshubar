@@ -13,14 +13,14 @@
         <div class="mt-4">
             {% if current_user.is_authenticated %}
             <a href="{{ url_for('upload_problem') }}" class="btn btn-accent btn-lg me-2">
-                📤 上传第一道错题
+                ↑ 上传第一道错题
             </a>
             <a href="{{ url_for('problem_list') }}" class="btn btn-outline-light btn-lg">
-                📖 浏览题目库
+                ≡ 浏览题目库
             </a>
             {% else %}
             <a href="{{ url_for('register') }}" class="btn btn-accent btn-lg me-2">
-                🚀 免费注册开始学习
+                → 免费注册开始学习
             </a>
             <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">
                 登录
@@ -87,7 +87,7 @@
 <!-- 覆盖知识点 -->
 <div class="row mt-5 pt-3">
     <div class="col-12 text-center mb-4">
-        <h4 class="fw-bold">📐 覆盖数学核心内容</h4>
+        <h4 class="fw-bold">∑ 覆盖数学核心内容</h4>
         <p class="text-muted">从大学一年级到考研，系统化学习路径</p>
     </div>
     {% set subjects = [
@@ -116,21 +116,21 @@
     </div>
     <div class="col-md-4 mb-3">
         <div class="card h-100 text-center p-4" style="border: 2px dashed #d0d4e0 !important; background: #fafbfc;">
-            <div class="fs-1 mb-2">📊</div>
+            <div class="fs-1 mb-2">⊞</div>
             <h6 class="fw-bold">学习数据统计</h6>
             <small class="text-muted">查看你的学习进度、正确率趋势、薄弱知识点</small>
         </div>
     </div>
     <div class="col-md-4 mb-3">
         <div class="card h-100 text-center p-4" style="border: 2px dashed #d0d4e0 !important; background: #fafbfc;">
-            <div class="fs-1 mb-2">🗓️</div>
+            <div class="fs-1 mb-2">⊡</div>
             <h6 class="fw-bold">智能复习计划</h6>
             <small class="text-muted">基于遗忘曲线自动安排复习，巩固薄弱点</small>
         </div>
     </div>
     <div class="col-md-4 mb-3">
         <div class="card h-100 text-center p-4" style="border: 2px dashed #d0d4e0 !important; background: #fafbfc;">
-            <div class="fs-1 mb-2">🏆</div>
+            <div class="fs-1 mb-2">⊛</div>
             <h6 class="fw-bold">每日挑战</h6>
             <small class="text-muted">每天一道精选题目，打卡学习，持续进步</small>
         </div>
@@ -144,11 +144,11 @@
             <div class="card-body p-4">
                 <div class="row align-items-center">
                     <div class="col-md-8">
-                        <h5 class="fw-bold mb-1">💬 意见反馈</h5>
+                        <h5 class="fw-bold mb-1">⊷ 意见反馈</h5>
                         <p class="text-muted mb-0 small">你的每一条建议都是产品进步的动力</p>
                     </div>
                     <div class="col-md-4 text-end">
-                        <button class="btn btn-outline-primary" onclick="document.getElementById('feedbackModal').style.display='block'">📝 提意见</button>
+                        <button class="btn btn-outline-primary" onclick="document.getElementById('feedbackModal').style.display='block'">§ 提意见</button>
                     </div>
                 </div>
             </div>
@@ -160,7 +160,7 @@
 <div id="feedbackModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:9999; padding-top:100px;">
     <div class="bg-white rounded p-4 mx-auto" style="max-width:500px; box-shadow:0 10px 40px rgba(0,0,0,0.2);">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold mb-0">💬 意见反馈</h5>
+            <h5 class="fw-bold mb-0">⊷ 意见反馈</h5>
             <button class="btn-close" onclick="document.getElementById('feedbackModal').style.display='none'"></button>
         </div>
         <form id="feedbackForm">
@@ -189,7 +189,7 @@ document.getElementById('feedbackForm').addEventListener('submit', function(e) {
     }).then(function(r) { return r.json(); })
     .then(function(data) {
         if (data.success) {
-            status.innerHTML = '<span class="text-success">✅ 感谢你的反馈！</span>';
+            status.innerHTML = '<span class="text-success">✓ 感谢你的反馈！</span>';
             document.getElementById('feedbackContent').value = '';
             setTimeout(function() {
                 document.getElementById('feedbackModal').style.display = 'none';

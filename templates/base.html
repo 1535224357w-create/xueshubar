@@ -37,8 +37,8 @@
                             上传错题
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ url_for('upload_problem') }}">⌨️ 文本输入</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('upload_photo') }}">📸 拍照上传</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('upload_problem') }}">⌨ 文本输入</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('upload_photo') }}">◉ 拍照上传</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
@@ -46,7 +46,7 @@
                            href="{{ url_for('my_wrong_problems') }}">错题本</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('vip_page') }}">💎 会员</a>
+                        <a class="nav-link" href="{{ url_for('vip_page') }}">◆ 会员</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -54,7 +54,7 @@
                     {% if current_user.is_authenticated %}
                     <li class="nav-item">
                         <span class="nav-link text-light">
-                            👤 {{ current_user.username }}{% if current_user.is_vip %} 💎{% endif %}
+                            ∘ {{ current_user.username }}{% if current_user.is_vip %} ◆{% endif %}
                         </span>
                     </li>
                     <li class="nav-item">
@@ -96,7 +96,7 @@
     <!-- ========== 页脚 ========== -->
     <footer class="footer">
         <div class="container">
-            <span>📐 学数 bar — 用 AI 帮你征服数学</span>
+            <span>∑ 学数 bar — 用 AI 帮你征服数学</span>
         </div>
     </footer>
 

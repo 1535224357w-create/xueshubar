@@ -2,7 +2,7 @@
 {% block title %}会员中心{% endblock %}
 {% block content %}
 <div class="text-center mb-4">
-    <h2 class="fw-bold">💎 会员中心</h2>
+    <h2 class="fw-bold">◆ 会员中心</h2>
     <p class="text-muted">无限上传，畅享全部功能</p>
 </div>
 
@@ -16,9 +16,9 @@
                     <div>
                         <h5 class="mb-1">
                             {% if current_user.is_vip %}
-                                💎 VIP 会员
+                                ◆ VIP 会员
                             {% else %}
-                                👤 免费用户
+                                ∘ 免费用户
                             {% endif %}
                         </h5>
                         {% if current_user.is_vip %}
@@ -53,44 +53,44 @@
                         <tr>
                             <th style="width:40%">功能</th>
                             <th class="text-center text-muted">免费</th>
-                            <th class="text-center text-warning fw-bold">💎 会员</th>
+                            <th class="text-center text-warning fw-bold">◆ 会员</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td>浏览题目库</td>
-                            <td class="text-center">✅</td>
-                            <td class="text-center">✅</td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center">✓</td>
                         </tr>
                         <tr>
-                            <td>📸 拍照上传</td>
+                            <td>◉ 拍照上传</td>
                             <td class="text-center">每天 3 次</td>
                             <td class="text-center">无限</td>
                         </tr>
                         <tr>
-                            <td>⌨️ 文本上传</td>
+                            <td>⌨ 文本上传</td>
                             <td class="text-center">每天 3 次</td>
                             <td class="text-center">无限</td>
                         </tr>
                         <tr>
-                            <td>✅ 答案</td>
-                            <td class="text-center">✅</td>
-                            <td class="text-center">✅</td>
+                            <td>✓ 答案</td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center">✓</td>
                         </tr>
                         <tr>
-                            <td>📖 解题分析</td>
-                            <td class="text-center">✅</td>
-                            <td class="text-center">✅</td>
+                            <td>≡ 解题分析</td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center">✓</td>
                         </tr>
                         <tr>
-                            <td>🎯 相似题推荐</td>
-                            <td class="text-center">✅</td>
-                            <td class="text-center">✅</td>
+                            <td>⊚ 相似题推荐</td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center">✓</td>
                         </tr>
                         <tr>
-                            <td>📊 函数图表</td>
-                            <td class="text-center">✅</td>
-                            <td class="text-center">✅</td>
+                            <td>⊞ 函数图表</td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center">✓</td>
                         </tr>
                     </tbody>
                 </table>
@@ -110,7 +110,7 @@
     <div class="col-md-4">
         <div class="card text-center h-100 {% if badge == 'recommended' %}border-warning border-2{% endif %}">
             {% if badge == 'recommended' %}
-            <div class="card-header bg-warning text-white fw-bold py-2">🔥 推荐</div>
+            <div class="card-header bg-warning text-white fw-bold py-2">⊛ 推荐</div>
             {% endif %}
             <div class="card-body p-4">
                 <h4 class="fw-bold mb-1">{{ name }}</h4>
@@ -135,14 +135,14 @@
     <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-body text-center p-4">
-                <h5 class="mb-3">💳 扫码支付</h5>
+                <h5 class="mb-3">⊠ 扫码支付</h5>
                 <div id="qrcodeArea" class="mb-3">
                     <div class="spinner-border text-primary" role="status"></div>
                     <p class="text-muted mt-2">正在生成支付码...</p>
                 </div>
                 <p class="small text-muted mb-0">请使用支付宝或微信扫码</p>
                 <div id="payResult" style="display:none;" class="mt-3">
-                    <div class="display-1 mb-2">✅</div>
+                    <div class="display-1 mb-2">✓</div>
                     <h5 class="text-success">支付成功！</h5>
                     <p class="text-muted small">会员权益已开通，刷新页面即可使用</p>
                     <button class="btn btn-primary" onclick="location.reload()">刷新页面</button>
