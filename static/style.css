@@ -1,6 +1,6 @@
 /* ============================================
-   学数 bar - taste-skill 优化版
-   配色：深蓝 + 暖橙
+   学数 bar - 高级版
+   深蓝 + 暖橙 · 数学感 · 精致细节
    ============================================ */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
@@ -15,8 +15,8 @@
   --text: #1a1a2e;
   --text-muted: #6b7280;
   --border: rgba(0,0,0,0.06);
-  --radius-sm: 6px;
-  --radius: 12px;
+  --radius-sm: 8px;
+  --radius: 14px;
   --radius-lg: 20px;
 }
 
@@ -37,49 +37,62 @@ main.container { flex: 1; padding-top: 1.5rem; padding-bottom: 3rem; max-width: 
 
 /* ========== 导航栏 ========== */
 .navbar {
-  background: var(--primary-dark) !important;
-  box-shadow: 0 1px 0 rgba(255,255,255,0.06);
+  background: #0c1033 !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.05);
   padding: 0;
   height: 60px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
 }
 .navbar .container { height: 100%; }
 .navbar-brand {
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   letter-spacing: -0.3px;
   padding: 0;
+  opacity: 0.92;
 }
-.navbar-brand img { height: 28px; margin-right: 8px; }
-
+.navbar-brand img { height: 26px; margin-right: 8px; opacity: 0.95; }
 .navbar-nav { gap: 2px; }
 .navbar .nav-link {
   padding: 0.35rem 0.85rem !important;
   border-radius: 8px;
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   font-weight: 500;
-  color: rgba(255,255,255,0.75) !important;
+  color: rgba(255,255,255,0.6) !important;
   transition: all 0.2s;
 }
-.navbar .nav-link:hover { background: rgba(255,255,255,0.08); color: #fff !important; }
-.navbar .nav-link.active { background: rgba(255,255,255,0.12); color: #fff !important; }
+.navbar .nav-link:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.9) !important; }
+.navbar .nav-link.active { background: rgba(255,255,255,0.1); color: #fff !important; }
 
 /* ========== Hero ========== */
 .hero-section {
-  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, var(--primary-light) 100%);
+  background: linear-gradient(135deg, #0c1033 0%, #1a237e 50%, #1e2a7a 100%);
   color: #fff;
-  padding: 5rem 0 4rem;
+  padding: 5.5rem 0 4.5rem;
   margin: -1.5rem 0 3rem;
   position: relative;
   overflow: hidden;
 }
 .hero-section::before {
+  content: '∫ ∑ ∞ π √';
+  position: absolute;
+  bottom: -30px;
+  right: -20px;
+  font-size: 10rem;
+  font-weight: 300;
+  letter-spacing: 24px;
+  opacity: 0.035;
+  pointer-events: none;
+  font-family: 'Times New Roman', serif;
+}
+.hero-section::after {
   content: '';
   position: absolute;
-  top: -30%;
-  right: -10%;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(255,111,0,0.08) 0%, transparent 70%);
+  top: -40%;
+  right: -8%;
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, rgba(255,111,0,0.06) 0%, transparent 60%);
   border-radius: 50%;
   pointer-events: none;
 }
@@ -87,28 +100,30 @@ main.container { flex: 1; padding-top: 1.5rem; padding-bottom: 3rem; max-width: 
   font-size: 2.8rem;
   font-weight: 800;
   letter-spacing: -0.5px;
-  line-height: 1.15;
+  line-height: 1.12;
   margin-bottom: 1rem;
 }
 .hero-subtitle {
-  font-size: 1.1rem;
-  opacity: 0.8;
+  font-size: 1.05rem;
+  opacity: 0.7;
   max-width: 520px;
   line-height: 1.7;
+  font-weight: 400;
 }
 .hero-section .btn-accent {
   background: var(--accent);
   border: none;
   color: #fff;
-  box-shadow: 0 4px 14px rgba(255,111,0,0.3);
+  box-shadow: 0 4px 14px rgba(255,111,0,0.25);
+  font-weight: 600;
 }
 .hero-section .btn-outline-light {
-  border-color: rgba(255,255,255,0.3);
-  color: #fff;
+  border: 1.5px solid rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.85);
 }
 .hero-section .btn-outline-light:hover {
-  background: rgba(255,255,255,0.1);
-  border-color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.4);
 }
 
 /* ========== 卡片 ========== */
@@ -116,11 +131,11 @@ main.container { flex: 1; padding-top: 1.5rem; padding-bottom: 3rem; max-width: 
   background: var(--bg-card);
   border: 1px solid var(--border) !important;
   border-radius: var(--radius-lg);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-  transition: all 0.25s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  transition: all 0.3s ease;
 }
 .card:hover {
-  box-shadow: 0 12px 30px rgba(0,0,0,0.07);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.06);
   transform: translateY(-2px);
 }
 .card-header {
@@ -128,36 +143,58 @@ main.container { flex: 1; padding-top: 1.5rem; padding-bottom: 3rem; max-width: 
   border-bottom: 1px solid var(--border);
   padding: 1rem 1.5rem;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  letter-spacing: -0.2px;
 }
 .card-body { padding: 1.5rem; }
 
-/* 特色卡片 */
+/* 特色功能卡片 */
 .feature-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 2.5rem 2rem;
-  text-align: center;
+  padding: 1.5rem;
   height: 100%;
-  transition: all 0.3s ease;
+  transition: all 0.35s ease;
 }
 .feature-card:hover {
-  box-shadow: 0 16px 40px rgba(0,0,0,0.08);
-  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.07);
+  transform: translateY(-3px);
 }
-.feature-card .icon { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
-.feature-card h5 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.6rem; }
-.feature-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
+.feature-card .icon-symbol {
+  font-size: 1.8rem;
+  font-weight: 300;
+  color: var(--primary);
+  opacity: 0.7;
+  line-height: 1;
+  font-family: 'Times New Roman', serif;
+}
+.feature-card h5 { font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; letter-spacing: -0.2px; }
+.feature-card p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 0; }
 
-/* 带左边框的卡片 */
+/* 带左边框卡片 */
 .card.border-warning { border-left: 4px solid #f59e0b !important; }
 .card.border-success { border-left: 4px solid #22c55e !important; }
 .card.border-primary { border-left: 4px solid var(--primary) !important; }
 
+/* ========== 数学符号图标 ========== */
+.math-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #eef0ff 0%, #e8eafe 100%);
+  border-radius: 12px;
+  font-size: 1.3rem;
+  font-family: 'Times New Roman', serif;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
 /* ========== 题目内容 ========== */
 .problem-content {
-  font-size: 1rem;
+  font-size: 0.95rem;
   line-height: 1.8;
   padding: 1.2rem;
   background: #f8f9fc;
@@ -166,45 +203,41 @@ main.container { flex: 1; padding-top: 1.5rem; padding-bottom: 3rem; max-width: 
 }
 
 /* ========== 解题内容 ========== */
-.solution-content { line-height: 1.9; white-space: pre-wrap; font-size: 0.9rem; color: #374151; }
+.solution-content { line-height: 1.9; white-space: pre-wrap; font-size: 0.88rem; color: #374151; }
 .solution-content img {
   max-width: 100%; height: auto; margin: 1rem 0;
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
 }
-
-/* ========== 难度星星 ========== */
-.difficulty-stars { color: #f59e0b; letter-spacing: 2px; font-size: 0.8rem; }
 
 /* ========== 按钮 ========== */
 .btn {
   border-radius: 8px;
   font-weight: 600;
-  padding: 0.5rem 1.2rem;
-  transition: all 0.2s ease;
-  font-size: 0.875rem;
+  padding: 0.45rem 1.1rem;
+  transition: all 0.25s ease;
+  font-size: 0.85rem;
+  letter-spacing: -0.1px;
 }
 .btn-primary {
   background: var(--primary);
   border: none;
-  box-shadow: 0 2px 8px rgba(26,35,126,0.15);
 }
 .btn-primary:hover {
   background: var(--primary-light);
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(26,35,126,0.25);
+  box-shadow: 0 6px 16px rgba(26,35,126,0.2);
 }
 .btn-accent {
   background: var(--accent);
   border: none;
   color: #fff;
-  box-shadow: 0 2px 8px rgba(255,111,0,0.2);
 }
 .btn-accent:hover {
   background: var(--accent-light);
   color: #fff;
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(255,111,0,0.3);
+  box-shadow: 0 6px 14px rgba(255,111,0,0.25);
 }
 .btn-outline-primary {
   border: 1.5px solid var(--primary);
@@ -215,20 +248,20 @@ main.container { flex: 1; padding-top: 1.5rem; padding-bottom: 3rem; max-width: 
   color: #fff;
   transform: translateY(-1px);
 }
-.btn-lg { padding: 0.7rem 1.5rem; font-size: 0.95rem; }
-.btn-sm { padding: 0.3rem 0.8rem; font-size: 0.8rem; border-radius: 6px; }
+.btn-lg { padding: 0.65rem 1.4rem; font-size: 0.9rem; }
+.btn-sm { padding: 0.25rem 0.75rem; font-size: 0.78rem; border-radius: 6px; }
 
 /* ========== Badge ========== */
-.badge { font-weight: 500; padding: 0.25em 0.65em; border-radius: 6px; font-size: 0.78rem; }
+.badge { font-weight: 500; padding: 0.2em 0.6em; border-radius: 6px; font-size: 0.75rem; }
 .badge-kp { background: #eef0ff; color: var(--primary); }
 
 /* ========== 知识树 ========== */
-.kp-node { border-left: 3px solid var(--primary-light); padding-left: 1rem; margin-bottom: 0.4rem; }
+.kp-node { border-left: 2.5px solid var(--primary-light); padding-left: 1rem; margin-bottom: 0.4rem; }
 .kp-node-parent {
   background: #fff;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 1.2rem;
+  padding: 1.1rem;
   margin-bottom: 1rem;
   transition: all 0.2s;
 }
@@ -236,48 +269,48 @@ main.container { flex: 1; padding-top: 1.5rem; padding-bottom: 3rem; max-width: 
 
 /* ========== 空状态 ========== */
 .empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-muted); }
-.empty-state .icon { font-size: 3.5rem; margin-bottom: 1rem; opacity: 0.4; }
+.empty-state .icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.35; }
 
 /* ========== 页脚 ========== */
 .footer {
-  background: var(--primary-dark);
-  color: rgba(255,255,255,0.55);
+  background: #0c1033;
+  color: rgba(255,255,255,0.4);
   padding: 2rem 0;
   margin-top: auto;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   text-align: center;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.5px;
 }
 
 /* ========== 认证卡片 ========== */
 .auth-card { max-width: 400px; margin: 3rem auto; }
-.auth-card .card { box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
+.auth-card .card { box-shadow: 0 8px 30px rgba(0,0,0,0.06); }
 
 /* ========== Alert ========== */
 .alert {
   border-radius: 12px;
   border: none;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  font-size: 0.9rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  font-size: 0.88rem;
 }
 
 /* ========== 表单 ========== */
 .form-control, .form-select {
   border-radius: 8px;
   border: 1.5px solid #e5e7eb;
-  padding: 0.55rem 1rem;
-  font-size: 0.9rem;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.88rem;
   transition: all 0.2s;
 }
 .form-control:focus, .form-select:focus {
   border-color: var(--primary-light);
-  box-shadow: 0 0 0 3px rgba(26,35,126,0.08);
+  box-shadow: 0 0 0 3px rgba(26,35,126,0.06);
 }
 
 /* ========== 知识点标签 ========== */
 .subject-tag {
   display: block;
-  padding: 1rem;
+  padding: 0.9rem;
   border-radius: 12px;
   background: #fff;
   border: 1px solid var(--border);
@@ -286,22 +319,33 @@ main.container { flex: 1; padding-top: 1.5rem; padding-bottom: 3rem; max-width: 
 }
 .subject-tag:hover {
   border-color: var(--primary-light);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
+
+/* ========== 难度星星 ========== */
+.difficulty-stars { color: #f59e0b; letter-spacing: 1.5px; font-size: 0.75rem; }
 
 /* ========== 动画 ========== */
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(16px); }
+  from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.animate-in { animation: fadeInUp 0.5s ease both; }
-.animate-in:nth-child(2) { animation-delay: 0.1s; }
-.animate-in:nth-child(3) { animation-delay: 0.2s; }
+.animate-in { animation: fadeInUp 0.4s ease both; }
+
+/* ========== 分割线标题 ========== */
+.section-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
 
 /* ========== 响应式 ========== */
 @media (max-width: 768px) {
-  .hero-title { font-size: 1.8rem; }
-  .hero-section { padding: 3rem 0 2.5rem; margin: -1.5rem -0.75rem 2rem; }
-  body { font-size: 0.95rem; }
+  .hero-title { font-size: 1.6rem; }
+  .hero-section { padding: 2.5rem 0 2rem; margin: -1.5rem -0.75rem 2rem; }
+  body { font-size: 0.92rem; }
 }
