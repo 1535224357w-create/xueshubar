@@ -38,6 +38,20 @@ def register():
             flash('邮箱已注册')
             return render_template('register.html')
 
+        # 密码强度检查
+        errors = []
+        if len(password) < 8:
+            errors.append('密码至少 8 位')
+        if not any(c.isupper() for c in password):
+            errors.append('需包含大写字母')
+        if not any(c.islower() for c in password):
+            errors.append('需包含小写字母')
+        if not any(c.isdigit() for c in password):
+            errors.append('需包含数字')
+        if errors:
+            flash('密码强度不足：' + '、'.join(errors))
+            return render_template('register.html')
+
         user = User(username=username, email=email)
         user.set_password(password)
         db.session.add(user)
