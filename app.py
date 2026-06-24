@@ -479,12 +479,13 @@ def create_order():
         try:
             from alipay import AliPay
             import os
-            alipay_private_key_path = os.path.join(os.path.dirname(__file__), 'alipay_private_key.pem')
-            alipay_public_key_path = os.path.join(os.path.dirname(__file__), 'alipay_public_key.pem')
-
-            with open(alipay_private_key_path) as f:
-                private_key = f.read()
-            with open(alipay_public_key_path) as f:
+            # 私钥：优先从环境变量读取，其次从文件
+            app_dir = os.path.dirname(__file__)
+            private_key = os.getenv('ALIPAY_PRIVATE_KEY', '')
+            if not private_key:
+                with open(os.path.join(app_dir, 'alipay_private_key.pem')) as f:
+                    private_key = f.read()
+            with open(os.path.join(app_dir, 'alipay_public_key.pem')) as f:
                 public_key = f.read()
 
             alipay = AliPay(
@@ -531,9 +532,12 @@ def alipay_notify():
     from alipay import AliPay
     import os
     try:
-        with open(os.path.join(os.path.dirname(__file__), 'alipay_private_key.pem')) as f:
-            private_key = f.read()
-        with open(os.path.join(os.path.dirname(__file__), 'alipay_public_key.pem')) as f:
+        app_dir = os.path.dirname(__file__)
+        private_key = os.getenv('ALIPAY_PRIVATE_KEY', '')
+        if not private_key:
+            with open(os.path.join(app_dir, 'alipay_private_key.pem')) as f:
+                private_key = f.read()
+        with open(os.path.join(app_dir, 'alipay_public_key.pem')) as f:
             public_key = f.read()
 
         alipay = AliPay(

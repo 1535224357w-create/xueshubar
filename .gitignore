@@ -19,6 +19,7 @@ Thumbs.db
 *.log
 feedback.log
 
-# Temp
+# Keys (sensitive!)
+alipay_private*.pem
 test_*.png
 sample_*.png
