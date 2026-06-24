@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <!-- 题目库 - 书 + ∑ -->
+  <symbol id="icon-library" viewBox="0 0 40 40">
+    <rect width="40" height="40" rx="10" fill="#eef0ff"/>
+    <path d="M12 12h4v16h-4zM16 12l12 4v12l-12-4z" fill="#1a237e" opacity=".85"/>
+    <text x="30" y="16" font-family="Times New Roman" font-size="9" font-weight="bold" fill="#1a237e" opacity=".6">∑</text>
+  </symbol>
+
+  <!-- AI 分析 - 闪电 + ∫ -->
+  <symbol id="icon-ai" viewBox="0 0 40 40">
+    <rect width="40" height="40" rx="10" fill="#fff3e0"/>
+    <path d="M22 8l-8 14h6l-2 10 10-16h-6z" fill="#e65100" opacity=".85"/>
+    <text x="12" y="30" font-family="Times New Roman" font-size="11" font-weight="bold" fill="#e65100" opacity=".5">∫</text>
+  </symbol>
+
+  <!-- 精准强化 - 靶心 + ∞ -->
+  <symbol id="icon-target" viewBox="0 0 40 40">
+    <rect width="40" height="40" rx="10" fill="#eef0ff"/>
+    <circle cx="20" cy="20" r="9" fill="none" stroke="#1a237e" stroke-width="1.5" opacity=".5"/>
+    <circle cx="20" cy="20" r="4" fill="#1a237e" opacity=".7"/>
+    <text x="27" y="14" font-family="Times New Roman" font-size="8" font-weight="bold" fill="#1a237e" opacity=".5">∞</text>
+  </symbol>
+
+  <!-- VIP 会员 - 钻石 + π -->
+  <symbol id="icon-vip" viewBox="0 0 40 40">
+    <rect width="40" height="40" rx="10" fill="#fef3c7"/>
+    <path d="M20 8l4 6-4 8-4-8z" fill="#f59e0b" opacity=".8"/>
+    <path d="M24 14l4-2-4 8zM16 14l-4-2 4 8z" fill="#f59e0b" opacity=".5"/>
+    <text x="22" y="29" font-family="Times New Roman" font-size="8" font-weight="bold" fill="#92400e" opacity=".5">π</text>
+  </symbol>
+
+  <!-- 上传 - 向上箭头 -->
+  <symbol id="icon-upload" viewBox="0 0 40 40">
+    <rect width="40" height="40" rx="10" fill="#eef0ff"/>
+    <path d="M20 12l8 8h-5v8h-6v-8h-5z" fill="#1a237e" opacity=".7"/>
+  </symbol>
+
+  <!-- 拍照 - 相机 -->
+  <symbol id="icon-camera" viewBox="0 0 40 40">
+    <rect width="40" height="40" rx="10" fill="#fff3e0"/>
+    <rect x="10" y="13" width="20" height="14" rx="3" fill="none" stroke="#e65100" stroke-width="1.5" opacity=".7"/>
+    <circle cx="20" cy="20" r="4" fill="none" stroke="#e65100" stroke-width="1.5" opacity=".7"/>
+    <path d="M15 13l2-3h6l2 3" fill="none" stroke="#e65100" stroke-width="1.2" opacity=".7"/>
+  </symbol>
+
+  <!-- 解题 - 思路图 -->
+  <symbol id="icon-solution" viewBox="0 0 40 40">
+    <rect width="40" height="40" rx="10" fill="#fef3c7"/>
+    <path d="M12 28l6-10 4 4 6-8" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="12" cy="28" r="2" fill="#f59e0b" opacity=".7"/>
+    <circle cx="18" cy="18" r="2" fill="#f59e0b" opacity=".7"/>
+    <circle cx="22" cy="22" r="2" fill="#f59e0b" opacity=".7"/>
+    <circle cx="28" cy="14" r="2" fill="#f59e0b" opacity=".7"/>
+  </symbol>
+</svg>
