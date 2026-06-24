@@ -30,38 +30,64 @@
     </div>
 </div>
 
-<!-- 特色功能 -->
+<!-- 特色功能 - 不对称布局 -->
 <div class="row g-4">
-    <div class="col-md-4 animate-in">
-        <div class="feature-card">
-            <div class="icon">📚</div>
-            <h5>系统题目库</h5>
-            <p>按知识点精心整理的数学题目，从基础到进阶，覆盖核心考点。</p>
-            <a href="{{ url_for('problem_list') }}" class="btn btn-outline-primary mt-2">浏览题目</a>
+    <div class="col-md-7 animate-in">
+        <div class="feature-card text-start p-4" style="background: linear-gradient(135deg, #f8f9ff 0%, #fff 100%);">
+            <div class="d-flex align-items-start gap-4">
+                <div class="icon" style="font-size:2.8rem; flex-shrink:0;">📚</div>
+                <div>
+                    <h5 class="fw-bold mb-2">系统题目库</h5>
+                    <p class="text-muted mb-3">按知识点精心整理的数学题目，从基础到进阶，覆盖核心考点。</p>
+                    <a href="{{ url_for('problem_list') }}" class="btn btn-primary btn-sm">浏览题目 →</a>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-md-4 animate-in">
-        <div class="feature-card">
-            <div class="icon">🤖</div>
-            <h5>AI 智能分析</h5>
-            <p>拍照或输入你的错题，AI 自动识别知识点、生成解析、推荐同类题目。</p>
-            {% if current_user.is_authenticated %}
-            <a href="{{ url_for('upload_photo') }}" class="btn btn-outline-primary mt-2">拍照上传</a>
-            {% else %}
-            <a href="{{ url_for('register') }}" class="btn btn-outline-primary mt-2">注册使用</a>
-            {% endif %}
+    <div class="col-md-5 animate-in" style="animation-delay:0.1s">
+        <div class="feature-card text-start p-4" style="background: linear-gradient(135deg, #fff7ed 0%, #fff 100%);">
+            <div class="d-flex align-items-start gap-4">
+                <div class="icon" style="font-size:2.8rem; flex-shrink:0;">🤖</div>
+                <div>
+                    <h5 class="fw-bold mb-2">AI 智能分析</h5>
+                    <p class="text-muted mb-3">拍照识别、自动解题、相似推荐</p>
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('upload_photo') }}" class="btn btn-sm btn-accent">拍照上传</a>
+                    {% else %}
+                    <a href="{{ url_for('register') }}" class="btn btn-sm btn-accent">注册使用</a>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-md-4 animate-in">
-        <div class="feature-card">
-            <div class="icon">🎯</div>
-            <h5>精准强化</h5>
-            <p>做错的题不再放过——AI 推荐相似题反复练习，直到真正掌握。</p>
-            {% if current_user.is_authenticated %}
-            <a href="{{ url_for('my_wrong_problems') }}" class="btn btn-outline-primary mt-2">我的错题本</a>
-            {% else %}
-            <a href="{{ url_for('register') }}" class="btn btn-outline-primary mt-2">开始学习</a>
-            {% endif %}
+</div>
+<div class="row g-4 mt-1">
+    <div class="col-md-5 animate-in" style="animation-delay:0.15s">
+        <div class="feature-card text-start p-4">
+            <div class="d-flex align-items-start gap-4">
+                <div class="icon" style="font-size:2.8rem; flex-shrink:0;">🎯</div>
+                <div>
+                    <h5 class="fw-bold mb-2">精准强化</h5>
+                    <p class="text-muted mb-3">同知识点相似题反复练习，直到真正掌握。</p>
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('my_wrong_problems') }}" class="btn btn-outline-primary btn-sm">错题本</a>
+                    {% else %}
+                    <a href="{{ url_for('register') }}" class="btn btn-outline-primary btn-sm">开始学习</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-7 animate-in" style="animation-delay:0.2s">
+        <div class="feature-card text-start p-4" style="background: linear-gradient(135deg, #f0fdf4 0%, #fff 100%);">
+            <div class="d-flex align-items-start gap-4">
+                <div class="icon" style="font-size:2.8rem; flex-shrink:0;">💎</div>
+                <div>
+                    <h5 class="fw-bold mb-2">VIP 会员</h5>
+                    <p class="text-muted mb-3">无限上传、畅享全部功能，让 AI 帮你征服数学。</p>
+                    <a href="{{ url_for('vip_page') }}" class="btn btn-sm btn-outline-warning">了解会员</a>
+                </div>
+            </div>
         </div>
     </div>
 </div>
