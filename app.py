@@ -52,12 +52,17 @@ def register():
             flash('密码强度不足：' + '、'.join(errors))
             return render_template('register.html')
 
-        user = User(username=username, email=email)
-        user.set_password(password)
-        db.session.add(user)
-        db.session.commit()
-        flash('注册成功，请登录')
-        return redirect(url_for('login'))
+        try:
+            user = User(username=username, email=email)
+            user.set_password(password)
+            db.session.add(user)
+            db.session.commit()
+            flash('注册成功，请登录')
+            return redirect(url_for('login'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'注册失败：{str(e)}')
+            return render_template('register.html')
 
     return render_template('register.html')
 
@@ -748,12 +753,8 @@ def init_database():
 
     db.create_all()
 
-    # 删除并重建 Order 表（兼容 schema 变更）
-    from models import Order as OrderModel
-    try:
-        OrderModel.__table__.drop(db.engine)
-    except Exception:
-        pass
+    # 确保所有表已创建
+    db.create_all()
     db.create_all()
 
     # 数据库迁移：添加新字段（兼容已有数据库）
