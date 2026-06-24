@@ -61,6 +61,11 @@ def register():
 
     return render_template('register.html')
 
+
+@app.route('/api/health')
+def health():
+    return 'ok'
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -743,6 +748,14 @@ def init_database():
 
     db.create_all()
 
+    # 删除并重建 Order 表（兼容 schema 变更）
+    from models import Order as OrderModel
+    try:
+        OrderModel.__table__.drop(db.engine)
+    except Exception:
+        pass
+    db.create_all()
+
     # 数据库迁移：添加新字段（兼容已有数据库）
     try:
         from sqlalchemy import text as sql_text
@@ -756,6 +769,11 @@ def init_database():
                 db.session.execute(sql_text(f'ALTER TABLE users ADD COLUMN {col} {col_type}'))
             except Exception:
                 pass
+        # 尝试修复 upload_count_today 类型（重建列）
+        try:
+            db.session.execute(sql_text('UPDATE users SET upload_count_today = 0 WHERE upload_count_today IS NULL'))
+        except Exception:
+            pass
         db.session.commit()
     except Exception:
         pass
