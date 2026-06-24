@@ -13,8 +13,9 @@
     <!-- ========== 导航栏 ========== -->
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">
-                📐 学数 bar
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
+                <img src="{{ url_for('static', filename='logo.svg') }}" alt="学数 bar" height="32" class="me-2">
+                学数 bar
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
