@@ -746,11 +746,16 @@ def init_database():
     # 数据库迁移：添加新字段（兼容已有数据库）
     try:
         from sqlalchemy import text as sql_text
-        for col in ['vip_expiry', 'upload_count_today', 'upload_date']:
+        cols_to_add = {
+            'vip_expiry': 'TIMESTAMP',
+            'upload_count_today': 'INTEGER DEFAULT 0',
+            'upload_date': 'DATE',
+        }
+        for col, col_type in cols_to_add.items():
             try:
-                db.session.execute(sql_text(f'ALTER TABLE users ADD COLUMN {col} TIMESTAMP'))
+                db.session.execute(sql_text(f'ALTER TABLE users ADD COLUMN {col} {col_type}'))
             except Exception:
-                pass  # 字段已存在
+                pass
         db.session.commit()
     except Exception:
         pass
