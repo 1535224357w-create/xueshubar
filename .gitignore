@@ -20,6 +20,5 @@ Thumbs.db
 feedback.log
 
 # Keys (sensitive!)
-alipay_private*.pem
 test_*.png
 sample_*.png
