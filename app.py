@@ -496,8 +496,9 @@ def create_order():
     # 构造支付订单号
     out_trade_no = f'XS{order.id:06d}{uuid.uuid4().hex[:8]}'
 
-    # 支付宝当面付
-    app_id = app.config.get('ALIPAY_APP_ID', '')
+    # 支付宝当面付（直接从环境变量读取，避免 Flask config 加载问题）
+    import os
+    app_id = os.environ.get('ALIPAY_APP_ID', app.config.get('ALIPAY_APP_ID', ''))
     if app_id:
         try:
             from alipay import AliPay
