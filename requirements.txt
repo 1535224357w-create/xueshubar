@@ -10,3 +10,5 @@ Pillow>=10.0
 matplotlib>=3.8
 numpy>=1.24
 gunicorn>=21.2
+alipay-sdk-python>=3.0
+cryptography>=41.0
