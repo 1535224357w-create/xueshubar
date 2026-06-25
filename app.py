@@ -496,9 +496,8 @@ def create_order():
     # 构造支付订单号
     out_trade_no = f'XS{order.id:06d}{uuid.uuid4().hex[:8]}'
 
-    # 支付宝当面付（直接从环境变量读取，避免 Flask config 加载问题）
-    import os
-    app_id = os.environ.get('ALIPAY_APP_ID', app.config.get('ALIPAY_APP_ID', ''))
+    # 支付宝当面付（APP_ID 不是敏感信息，直接写死）
+    app_id = '2021006167668054'
     if app_id:
         try:
             from alipay import AliPay
@@ -513,7 +512,7 @@ def create_order():
 
             alipay = AliPay(
                 appid=app_id,
-                app_notify_url=app.config.get('ALIPAY_NOTIFY_URL', ''),
+                app_notify_url='https://xueshubar.onrender.com/api/alipay/notify',
                 app_private_key_string=private_key,
                 alipay_public_key_string=public_key,
                 sign_type='RSA2',
@@ -566,7 +565,7 @@ def alipay_notify():
             public_key = f.read()
 
         alipay = AliPay(
-            appid=app.config['ALIPAY_APP_ID'],
+            appid='2021006167668054',
             app_notify_url='',
             app_private_key_string=private_key,
             alipay_public_key_string=public_key,
