@@ -503,21 +503,21 @@ def create_order():
             from alipay import AliPay
             import os
             app_dir = os.path.dirname(__file__)
-            private_key = os.getenv('ALIPAY_PRIVATE_KEY', '')
-            if not private_key:
+            private_key_raw = os.getenv('ALIPAY_PRIVATE_KEY', '')
+            if private_key_raw:
+                # 从 Base64 解码（兼容 Render 环境变量丢失换行符）
+                import base64
+                try:
+                    private_key_bytes = base64.b64decode(private_key_raw)
+                    private_key = private_key_bytes.decode('utf-8')
+                except:
+                    # 如果不是 base64，尝试直接作为 PEM 使用
+                    private_key = private_key_raw
+                    if '\\n' in private_key:
+                        private_key = private_key.replace('\\n', '\n')
+            else:
                 with open(os.path.join(app_dir, 'alipay_private_key.pem')) as f:
                     private_key = f.read()
-            # 兼容环境变量丢失换行符的情况：自动修复 PEM 格式
-            if private_key and '-----' not in private_key[:50]:
-                # 尝试从 Base64 重新构建 PEM
-                if '\\n' in private_key:
-                    private_key = private_key.replace('\\n', '\n')
-                if '\n' not in private_key:
-                    import textwrap
-                    b64 = private_key.strip()
-                    private_key = '-----BEGIN RSA PRIVATE KEY-----\n'
-                    private_key += '\n'.join(textwrap.wrap(b64, 64))
-                    private_key += '\n-----END RSA PRIVATE KEY-----'
             with open(os.path.join(app_dir, 'alipay_public_key.pem')) as f:
                 public_key = f.read()
 
