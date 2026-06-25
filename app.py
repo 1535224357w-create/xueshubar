@@ -496,57 +496,43 @@ def create_order():
     # 构造支付订单号
     out_trade_no = f'XS{order.id:06d}{uuid.uuid4().hex[:8]}'
 
-    # 支付宝当面付（APP_ID 不是敏感信息，直接写死）
-    app_id = '2021006167668054'
-    if app_id:
-        try:
-            from alipay import AliPay
-            import os
-            app_dir = os.path.dirname(__file__)
-            private_key_raw = os.getenv('ALIPAY_PRIVATE_KEY', '')
-            if private_key_raw:
-                # 从 Base64 解码（兼容 Render 环境变量丢失换行符）
-                import base64
-                try:
-                    private_key_bytes = base64.b64decode(private_key_raw)
-                    private_key = private_key_bytes.decode('utf-8')
-                except:
-                    # 如果不是 base64，尝试直接作为 PEM 使用
-                    private_key = private_key_raw
-                    if '\\n' in private_key:
-                        private_key = private_key.replace('\\n', '\n')
-            else:
-                with open(os.path.join(app_dir, 'alipay_private_key.pem')) as f:
-                    private_key = f.read()
-            with open(os.path.join(app_dir, 'alipay_public_key.pem')) as f:
-                public_key = f.read()
+    # 支付宝当面付（直接 API 调用，不依赖 SDK）
+    try:
+        import os
+        app_dir = os.path.dirname(__file__)
 
-            alipay = AliPay(
-                appid=app_id,
-                app_notify_url='https://xueshubar.onrender.com/api/alipay/notify',
-                app_private_key_string=private_key,
-                alipay_public_key_string=public_key,
-                sign_type='RSA2',
-            )
+        # 读取私钥
+        private_key_raw = os.getenv('ALIPAY_PRIVATE_KEY', '')
+        if private_key_raw:
+            import base64
+            try:
+                private_key_bytes = base64.b64decode(private_key_raw)
+                private_key = private_key_bytes.decode('utf-8')
+            except:
+                private_key = private_key_raw
+                if '\\n' in private_key:
+                    private_key = private_key.replace('\\n', '\n')
+        else:
+            with open(os.path.join(app_dir, 'alipay_private_key.pem')) as f:
+                private_key = f.read()
 
-            result = alipay.api_alipay_trade_precreate(
-                subject='学数 bar VIP 会员',
-                out_trade_no=out_trade_no,
-                total_amount=amount / 100,
-            )
-
-            code = result.get('code')
-            if code == '10000':
-                order.payjs_order_id = out_trade_no
-                db.session.commit()
-                return jsonify({
-                    'qrcode': result.get('qr_code', ''),
-                    'order_id': order.id,
-                })
-            else:
-                print(f'[支付宝] 下单失败: {result}')
-        except Exception as e:
-            print(f'[支付宝] 异常: {e}')
+        from alipay_direct import create_qr_code
+        qr_code, error = create_qr_code(
+            app_id='2021006167668054',
+            private_key=private_key,
+            out_trade_no=out_trade_no,
+            total_amount=amount / 100,
+            subject='学数 bar VIP',
+            notify_url='https://xueshubar.onrender.com/api/alipay/notify'
+        )
+        if qr_code:
+            order.payjs_order_id = out_trade_no
+            db.session.commit()
+            return jsonify({'qrcode': qr_code, 'order_id': order.id})
+        else:
+            print(f'[支付宝] 失败: {error}')
+    except Exception as e:
+        print(f'[支付宝] 异常: {e}')
 
     # 未配置支付宝时返回模拟二维码
     order.payjs_order_id = 'sim_' + out_trade_no
