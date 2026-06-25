@@ -507,15 +507,17 @@ def create_order():
             if not private_key:
                 with open(os.path.join(app_dir, 'alipay_private_key.pem')) as f:
                     private_key = f.read()
-            else:
-                # 环境变量可能丢失换行符，修复 PEM 格式
-                if 'BEGIN RSA PRIVATE KEY' in private_key and not private_key.startswith('-----'):
-                    # 尝试修复：去掉可能的空格，确保有正确的换行
+            # 兼容环境变量丢失换行符的情况：自动修复 PEM 格式
+            if private_key and '-----' not in private_key[:50]:
+                # 尝试从 Base64 重新构建 PEM
+                if '\\n' in private_key:
                     private_key = private_key.replace('\\n', '\n')
-                if not private_key.startswith('-----'):
-                    # 如果还是不对，从文件读取
-                    with open(os.path.join(app_dir, 'alipay_private_key.pem')) as f:
-                        private_key = f.read()
+                if '\n' not in private_key:
+                    import textwrap
+                    b64 = private_key.strip()
+                    private_key = '-----BEGIN RSA PRIVATE KEY-----\n'
+                    private_key += '\n'.join(textwrap.wrap(b64, 64))
+                    private_key += '\n-----END RSA PRIVATE KEY-----'
             with open(os.path.join(app_dir, 'alipay_public_key.pem')) as f:
                 public_key = f.read()
 
@@ -570,6 +572,15 @@ def alipay_notify():
         if not private_key:
             with open(os.path.join(app_dir, 'alipay_private_key.pem')) as f:
                 private_key = f.read()
+        if private_key and '-----' not in private_key[:50]:
+            if '\\n' in private_key:
+                private_key = private_key.replace('\\n', '\n')
+            if '\n' not in private_key:
+                import textwrap
+                b64 = private_key.strip()
+                private_key = '-----BEGIN RSA PRIVATE KEY-----\n'
+                private_key += '\n'.join(textwrap.wrap(b64, 64))
+                private_key += '\n-----END RSA PRIVATE KEY-----'
         with open(os.path.join(app_dir, 'alipay_public_key.pem')) as f:
             public_key = f.read()
 
