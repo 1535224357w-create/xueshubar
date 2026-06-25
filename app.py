@@ -519,8 +519,10 @@ def create_order():
                     'qrcode': result.get('qr_code', ''),
                     'order_id': order.id,
                 })
+            else:
+                print(f'[支付宝] 下单失败: {result}')
         except Exception as e:
-            print(f'[支付宝] 下单异常: {e}')  # Render 日志可见
+            print(f'[支付宝] 异常: {e}')
 
     # 未配置支付宝时返回模拟二维码
     order.payjs_order_id = 'sim_' + out_trade_no
