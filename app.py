@@ -63,9 +63,11 @@ def check_alipay():
     """检查支付宝配置状态"""
     import os
     info = {
-        'ALIPAY_APP_ID': bool(app.config.get('ALIPAY_APP_ID', '')),
+        'ALIPAY_APP_ID_set': bool(os.environ.get('ALIPAY_APP_ID', '')),
+        'ALIPAY_APP_ID_from_config': bool(app.config.get('ALIPAY_APP_ID', '')),
+        'ALIPAY_APP_ID_raw': str(os.environ.get('ALIPAY_APP_ID', '空'))[:15],
         'ALIPAY_NOTIFY_URL': app.config.get('ALIPAY_NOTIFY_URL', ''),
-        'ALIPAY_PRIVATE_KEY': bool(os.getenv('ALIPAY_PRIVATE_KEY', '')),
+        'ALIPAY_PRIVATE_KEY_set': bool(os.environ.get('ALIPAY_PRIVATE_KEY', '')),
         'PUBLIC_KEY_FILE': os.path.exists(os.path.join(os.path.dirname(__file__), 'alipay_public_key.pem')),
     }
     return jsonify(info)
