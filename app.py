@@ -57,6 +57,19 @@ def register():
 def health():
     return 'ok'
 
+
+@app.route('/api/check-alipay')
+def check_alipay():
+    """检查支付宝配置状态"""
+    import os
+    info = {
+        'ALIPAY_APP_ID': bool(app.config.get('ALIPAY_APP_ID', '')),
+        'ALIPAY_NOTIFY_URL': app.config.get('ALIPAY_NOTIFY_URL', ''),
+        'ALIPAY_PRIVATE_KEY': bool(os.getenv('ALIPAY_PRIVATE_KEY', '')),
+        'PUBLIC_KEY_FILE': os.path.exists(os.path.join(os.path.dirname(__file__), 'alipay_public_key.pem')),
+    }
+    return jsonify(info)
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
