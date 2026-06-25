@@ -62,10 +62,10 @@ def health():
 def check_alipay():
     """检查支付宝配置状态"""
     import os
+    ver = 'v3'  # 更新版本号时修改这里
     info = {
+        'version': ver,
         'os_env': str(os.environ.get('ALIPAY_APP_ID', '空'))[:20],
-        'from_config': str(app.config.get('ALIPAY_APP_ID', '空'))[:20],
-        'config_raw': str(app.config.get('ALIPAY_APP_ID', 'NONE'))[:20],
         'has_private_key': bool(os.environ.get('ALIPAY_PRIVATE_KEY', '')),
     }
     return jsonify(info)
