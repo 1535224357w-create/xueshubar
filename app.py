@@ -489,7 +489,6 @@ def create_order():
         try:
             from alipay import AliPay
             import os
-            # 私钥：优先从环境变量读取，其次从文件
             app_dir = os.path.dirname(__file__)
             private_key = os.getenv('ALIPAY_PRIVATE_KEY', '')
             if not private_key:
@@ -506,22 +505,22 @@ def create_order():
                 sign_type='RSA2',
             )
 
-            # 当面付 - 预下单生成二维码
             result = alipay.api_alipay_trade_precreate(
                 subject='学数 bar VIP 会员',
                 out_trade_no=out_trade_no,
-                total_amount=amount / 100,  # 元
+                total_amount=amount / 100,
             )
 
-            if result.get('code') == '10000':
+            code = result.get('code')
+            if code == '10000':
                 order.payjs_order_id = out_trade_no
                 db.session.commit()
                 return jsonify({
                     'qrcode': result.get('qr_code', ''),
                     'order_id': order.id,
                 })
-        except Exception:
-            pass
+        except Exception as e:
+            print(f'[支付宝] 下单异常: {e}')  # Render 日志可见
 
     # 未配置支付宝时返回模拟二维码
     order.payjs_order_id = 'sim_' + out_trade_no
