@@ -507,6 +507,15 @@ def create_order():
             if not private_key:
                 with open(os.path.join(app_dir, 'alipay_private_key.pem')) as f:
                     private_key = f.read()
+            else:
+                # 环境变量可能丢失换行符，修复 PEM 格式
+                if 'BEGIN RSA PRIVATE KEY' in private_key and not private_key.startswith('-----'):
+                    # 尝试修复：去掉可能的空格，确保有正确的换行
+                    private_key = private_key.replace('\\n', '\n')
+                if not private_key.startswith('-----'):
+                    # 如果还是不对，从文件读取
+                    with open(os.path.join(app_dir, 'alipay_private_key.pem')) as f:
+                        private_key = f.read()
             with open(os.path.join(app_dir, 'alipay_public_key.pem')) as f:
                 public_key = f.read()
 
