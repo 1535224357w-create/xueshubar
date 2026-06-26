@@ -638,7 +638,7 @@ def activate_code():
     return jsonify({'success': True, 'msg': f'VIP 已开通，有效期至 {current_user.vip_expiry.strftime("%Y-%m-%d")}'})
 
 
-@app.route('/api/admin/gen-code', methods=['POST'])
+@app.route('/admin-codes')
 @login_required
 def admin_codes():
     """激活码管理页面"""
