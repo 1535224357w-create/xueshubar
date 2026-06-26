@@ -671,6 +671,25 @@ def gen_code():
     return jsonify({'codes': codes})
 
 
+@app.route('/api/admin/reset-users', methods=['POST'])
+@login_required
+def reset_users():
+    """清空所有用户数据（仅管理员，用于清理测试数据）"""
+    if current_user.id != 1:
+        return jsonify({'error': '无权限'}), 403
+    try:
+        db.session.execute(db.text('DELETE FROM orders'))
+        db.session.execute(db.text('DELETE FROM user_wrong_problems'))
+        db.session.execute(db.text('DELETE FROM activation_codes'))
+        db.session.execute(db.text('DELETE FROM users'))
+        db.session.execute(db.text('DELETE FROM problems WHERE source=\'user_upload\''))
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception:
+        db.session.rollback()
+        return jsonify({'error': '失败'}), 500
+
+
 @app.route('/api/vip/check-order')
 @login_required
 def check_order():
