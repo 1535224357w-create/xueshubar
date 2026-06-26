@@ -120,3 +120,17 @@ class UserWrongProblem(db.Model):
     user_answer = db.Column(db.Text, default='')           # 用户填的答案
     note = db.Column(db.Text, default='')                  # 用户的笔记
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+class ActivationCode(db.Model):
+    """激活码"""
+    __tablename__ = 'activation_codes'
+
+    id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.String(32), unique=True, nullable=False, index=True)
+    plan = db.Column(db.String(20), nullable=False)  # monthly / quarterly / yearly
+    is_used = db.Column(db.Boolean, default=False)
+    used_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    used_at = db.Column(db.DateTime, nullable=True)
+    created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))

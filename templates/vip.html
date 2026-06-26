@@ -130,6 +130,55 @@
     {% endfor %}
 </div>
 
+<!-- 激活码 -->
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body p-4">
+                <div class="text-center mb-3">
+                    <h5 class="fw-bold">⊠ 激活码兑换</h5>
+                    <p class="text-muted small">输入购买的激活码开通 VIP</p>
+                </div>
+                <form id="activateForm" onsubmit="return activateVip(event)">
+                    <div class="input-group">
+                        <input type="text" id="codeInput" class="form-control"
+                               placeholder="输入激活码 (如 XXXX-XXXX)" style="text-transform:uppercase;"
+                               pattern="[A-Z0-9]{4}-[A-Z0-9]{4}" required>
+                        <button class="btn btn-primary" type="submit">激活</button>
+                    </div>
+                    <div id="activateMsg" class="mt-2 small"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function activateVip(e) {
+    e.preventDefault();
+    var code = document.getElementById('codeInput').value.trim();
+    var msg = document.getElementById('activateMsg');
+    if (!code) { msg.innerHTML = '<span class="text-danger">请输入激活码</span>'; return; }
+    msg.innerHTML = '<span class="text-muted">验证中...</span>';
+    fetch('/api/vip/activate', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({code: code})
+    }).then(function(r) { return r.json(); })
+    .then(function(d) {
+        if (d.success) {
+            msg.innerHTML = '<span class="text-success">' + d.msg + '</span>';
+            setTimeout(function(){ location.reload(); }, 1500);
+        } else {
+            msg.innerHTML = '<span class="text-danger">' + (d.msg || '激活失败') + '</span>';
+        }
+    }).catch(function() {
+        msg.innerHTML = '<span class="text-danger">网络错误</span>';
+    });
+    return false;
+}
+</script>
+
 <!-- 支付弹窗 QR -->
 <div class="modal fade" id="payModal" tabindex="-1">
     <div class="modal-dialog modal-sm modal-dialog-centered">

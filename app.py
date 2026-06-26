@@ -604,6 +604,63 @@ def alipay_notify():
         return 'fail'
 
 
+# ============ 激活码系统 ============
+@app.route('/api/vip/activate', methods=['POST'])
+@login_required
+def activate_code():
+    """使用激活码开通 VIP"""
+    data = request.get_json()
+    code_str = data.get('code', '').strip().upper() if data else ''
+    if not code_str:
+        return jsonify({'success': False, 'msg': '请输入激活码'}), 400
+
+    from models import ActivationCode
+    from datetime import datetime, timezone, timedelta
+
+    ac = ActivationCode.query.filter_by(code=code_str).first()
+    if not ac:
+        return jsonify({'success': False, 'msg': '激活码不存在'})
+    if ac.is_used:
+        return jsonify({'success': False, 'msg': '该激活码已被使用'})
+
+    # 激活
+    ac.is_used = True
+    ac.used_by = current_user.id
+    ac.used_at = datetime.now(timezone.utc)
+
+    durations = {'monthly': 30, 'quarterly': 90, 'yearly': 365}
+    days = durations.get(ac.plan, 30)
+    if current_user.vip_expiry and current_user.vip_expiry > datetime.now(timezone.utc):
+        current_user.vip_expiry += timedelta(days=days)
+    else:
+        current_user.vip_expiry = datetime.now(timezone.utc) + timedelta(days=days)
+    db.session.commit()
+    return jsonify({'success': True, 'msg': f'VIP 已开通，有效期至 {current_user.vip_expiry.strftime("%Y-%m-%d")}'})
+
+
+@app.route('/api/admin/gen-code', methods=['POST'])
+@login_required
+def gen_code():
+    """生成激活码（仅管理员）"""
+    if current_user.id != 1:
+        return jsonify({'error': '无权限'}), 403
+    data = request.get_json()
+    plan = data.get('plan', 'monthly') if data else 'monthly'
+    count = min(data.get('count', 1) if data else 1, 50)
+
+    from models import ActivationCode
+    import secrets
+    codes = []
+    for _ in range(count):
+        code = ''.join(secrets.choice('ABCDEFGHJKLMNPQRSTUVWXYZ23456789') for _ in range(4))
+        code += '-' + ''.join(secrets.choice('ABCDEFGHJKLMNPQRSTUVWXYZ23456789') for _ in range(4))
+        ac = ActivationCode(code=code, plan=plan, created_by=current_user.id)
+        db.session.add(ac)
+        codes.append(code)
+    db.session.commit()
+    return jsonify({'codes': codes})
+
+
 @app.route('/api/vip/check-order')
 @login_required
 def check_order():
