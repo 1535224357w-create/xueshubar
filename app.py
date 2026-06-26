@@ -640,6 +640,16 @@ def activate_code():
 
 @app.route('/api/admin/gen-code', methods=['POST'])
 @login_required
+def admin_codes():
+    """激活码管理页面"""
+    if current_user.id != 1:
+        flash('无权限')
+        return redirect(url_for('index'))
+    return render_template('admin_codes.html')
+
+
+@app.route('/api/admin/gen-code', methods=['POST'])
+@login_required
 def gen_code():
     """生成激活码（仅管理员）"""
     if current_user.id != 1:
