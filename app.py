@@ -959,36 +959,33 @@ def get_knowledge_tree_text():
 # ============ 初始化数据库 & 种子数据 ============
 def init_database():
     """初始化数据库并插入种子知识点"""
-    # 启用 WAL 模式，解决 SQLite 并发写入锁死问题
+    db.create_all()
+
+    # SQLite 特定优化
     from sqlalchemy import text
-    db.session.execute(text('PRAGMA journal_mode=WAL'))
-    db.session.execute(text('PRAGMA busy_timeout=5000'))
-    db.session.commit()
-
-    db.create_all()
-
-    # 确保所有表已创建
-    db.create_all()
-    db.create_all()
+    try:
+        db.session.execute(text('PRAGMA journal_mode=WAL'))
+        db.session.execute(text('PRAGMA busy_timeout=5000'))
+        db.session.commit()
+    except Exception:
+        pass  # PostgreSQL 不支持 PRAGMA
 
     # 数据库迁移：添加新字段（兼容已有数据库）
     try:
         from sqlalchemy import text as sql_text
-        cols_to_add = {
-            'vip_expiry': 'TIMESTAMP',
-            'upload_count_today': 'INTEGER DEFAULT 0',
-            'upload_date': 'DATE',
-        }
-        for col, col_type in cols_to_add.items():
+        import sqlalchemy
+        # 检查是否是 SQLite
+        is_sqlite = 'sqlite' in str(db.engine.url)
+        if is_sqlite:
+            for col, col_type in {'vip_expiry': 'TIMESTAMP', 'upload_count_today': 'INTEGER DEFAULT 0', 'upload_date': 'DATE'}.items():
+                try:
+                    db.session.execute(sql_text(f'ALTER TABLE users ADD COLUMN {col} {col_type}'))
+                except Exception:
+                    pass
             try:
-                db.session.execute(sql_text(f'ALTER TABLE users ADD COLUMN {col} {col_type}'))
+                db.session.execute(sql_text('UPDATE users SET upload_count_today = 0 WHERE upload_count_today IS NULL'))
             except Exception:
                 pass
-        # 尝试修复 upload_count_today 类型（重建列）
-        try:
-            db.session.execute(sql_text('UPDATE users SET upload_count_today = 0 WHERE upload_count_today IS NULL'))
-        except Exception:
-            pass
         db.session.commit()
     except Exception:
         pass

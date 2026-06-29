@@ -6,7 +6,7 @@ load_dotenv()
 
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///mathlearn.db'
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///mathlearn.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # AI API 配置（用于分析错题，目前使用 DeepSeek）
