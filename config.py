@@ -7,8 +7,12 @@ load_dotenv()
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
     raw_db_url = os.getenv('DATABASE_URL', '')
-    if raw_db_url and raw_db_url.startswith('postgresql://'):
-        raw_db_url = raw_db_url.replace('postgresql://', 'postgresql+pg8000://', 1)
+    if raw_db_url:
+        # 兼容 postgres:// 和 postgresql:// 两种前缀
+        if raw_db_url.startswith('postgres://'):
+            raw_db_url = 'postgresql+pg8000://' + raw_db_url[10:]
+        elif raw_db_url.startswith('postgresql://'):
+            raw_db_url = 'postgresql+pg8000://' + raw_db_url[13:]
     SQLALCHEMY_DATABASE_URI = raw_db_url or 'sqlite:///mathlearn.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

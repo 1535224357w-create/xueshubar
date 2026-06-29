@@ -1023,8 +1023,11 @@ def init_database():
     db.session.commit()
 
 # 确保数据库初始化（本地和 Render 部署都生效）
-with app.app_context():
-    init_database()
+try:
+    with app.app_context():
+        init_database()
+except Exception as e:
+    print(f'[DB] 初始化跳过: {e}')
 
 if __name__ == '__main__':
     app.run(debug=True)
