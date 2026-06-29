@@ -777,6 +777,22 @@ def gen_code():
     return jsonify({'codes': codes})
 
 
+@app.route('/api/admin/reset-password', methods=['POST'])
+def reset_admin_password():
+    """重置管理员密码（仅开发调试用）"""
+    try:
+        from models import User
+        user = db.session.get(User, 1)
+        if user:
+            new_pw = 'Admin123'
+            user.set_password(new_pw)
+            db.session.commit()
+            return jsonify({'success': True, 'username': user.username, 'new_password': new_pw})
+        return jsonify({'error': '管理员不存在'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/api/admin/reset-users', methods=['POST'])
 @login_required
 def reset_users():
