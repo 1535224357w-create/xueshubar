@@ -9,7 +9,7 @@ class Config:
     raw_url = os.getenv('DATABASE_URL', '')
     if raw_url:
         import re
-        raw_url = re.sub(r'^postgres(ql)?://', 'postgresql+pg8000://', raw_url)
+        raw_url = re.sub(r'^postgres(ql)?://', 'postgresql+psycopg2://', raw_url)
     SQLALCHEMY_DATABASE_URI = raw_url or 'sqlite:///mathlearn.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

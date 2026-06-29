@@ -3,7 +3,7 @@ WORKDIR /app
 
 # 安装系统依赖（matplotlib 等需要）
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential libfreetype6-dev libpng-dev && \
+    build-essential libfreetype6-dev libpng-dev libpq-dev && \
     rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
