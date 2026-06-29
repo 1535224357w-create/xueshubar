@@ -6,10 +6,8 @@ load_dotenv()
 
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
-    # 数据库 - Render PostgreSQL 直连
-    pg_url = 'postgresql+psycopg2://xueshubar:uwEMwo7DC8v6L2t5YzJEdO1qoFdhQN4G@dpg-d916prmgvqtc73a2j4i0-a/xueshubar'
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', pg_url)
-    SQLALCHEMY_ENGINE_OPTIONS = {'pool_pre_ping': True}
+    # 暂用 SQLite（PostgreSQL 后续再配置）
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///mathlearn.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # AI API 配置
