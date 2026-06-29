@@ -6,8 +6,13 @@ load_dotenv()
 
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
-    # 暂用 SQLite，后续再配置 PostgreSQL
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///mathlearn.db'
+    # PostgreSQL 数据库（Render 上必须用 Dockerfile 部署）
+    raw_url = os.getenv('DATABASE_URL')
+    if raw_url:
+        # Render 提供的 DATABASE_URL 先用 replace 转换
+        raw_url = raw_url.replace('postgres://', 'postgresql+psycopg2://')
+        raw_url = raw_url.replace('postgresql://', 'postgresql+psycopg2://')
+    SQLALCHEMY_DATABASE_URI = raw_url or 'sqlite:///mathlearn.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # AI API 配置
