@@ -6,7 +6,10 @@ load_dotenv()
 
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///mathlearn.db')
+    raw_db_url = os.getenv('DATABASE_URL', '')
+    if raw_db_url and raw_db_url.startswith('postgresql://'):
+        raw_db_url = raw_db_url.replace('postgresql://', 'postgresql+pg8000://', 1)
+    SQLALCHEMY_DATABASE_URI = raw_db_url or 'sqlite:///mathlearn.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # AI API 配置（用于分析错题，目前使用 DeepSeek）
