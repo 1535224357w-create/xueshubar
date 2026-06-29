@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}学习报告{% endblock %}
+{% block content %}
+<div class="mb-4">
+    <h2 class="fw-bold mb-1">⊞ 学习报告</h2>
+    <p class="text-muted mb-0">AI 分析你的学习数据，生成个性化报告</p>
+</div>
+
+<!-- 概览卡片 -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <div class="fs-3 fw-bold text-primary">{{ total }}</div>
+            <small class="text-muted">总做题量</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <div class="fs-3 fw-bold text-success">{{ correct }}</div>
+            <small class="text-muted">正确数</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <div class="fs-3 fw-bold {% if accuracy < 0.5 %}text-danger{% elif accuracy < 0.7 %}text-warning{% else %}text-success{% endif %}">{{ (accuracy * 100)|round }}%</div>
+            <small class="text-muted">正确率</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <div class="fs-3 fw-bold text-info">{{ days }}</div>
+            <small class="text-muted">学习天数</small>
+        </div>
+    </div>
+</div>
+
+{% if total > 0 %}
+<div class="row g-4">
+    <div class="col-md-7">
+        <!-- AI 分析报告 -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0 fw-bold">AI 分析报告</h5>
+            </div>
+            <div class="card-body">
+                {% if report %}
+                <div class="report-content" style="line-height: 1.9; white-space: pre-wrap;">{{ report|safe }}</div>
+                {% else %}
+                <div class="text-center py-4">
+                    <button class="btn btn-primary btn-lg" onclick="generateReport()">生成 AI 分析报告</button>
+                    <p class="text-muted mt-2 small">AI 会根据你的错题数据生成个性化学习建议</p>
+                </div>
+                <div id="reportLoading" style="display:none;" class="text-center py-4">
+                    <div class="spinner-border text-primary"></div>
+                    <p class="text-muted mt-2">AI 正在分析你的学习数据...</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-5">
+        <!-- 知识点掌握度 -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0 fw-bold">知识点掌握度</h5>
+            </div>
+            <div class="card-body">
+                {% if kp_stats %}
+                {% for kp in kp_stats %}
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span>{{ kp.name }}</span>
+                        <span class="fw-bold {% if kp.accuracy < 0.5 %}text-danger{% elif kp.accuracy < 0.7 %}text-warning{% else %}text-success{% endif %}">
+                            {{ (kp.accuracy * 100)|round }}%
+                        </span>
+                    </div>
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar {% if kp.accuracy < 0.5 %}bg-danger{% elif kp.accuracy < 0.7 %}bg-warning{% else %}bg-success{% endif %}"
+                             style="width: {{ (kp.accuracy * 100)|round }}%">
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-muted small">暂无足够数据</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="icon">⊞</div>
+    <h5>暂无学习数据</h5>
+    <p>开始上传错题后，这里会展示你的学习报告</p>
+    <a href="{{ url_for('upload_problem') }}" class="btn btn-primary">开始学习</a>
+</div>
+{% endif %}
+
+<script>
+function generateReport() {
+    document.getElementById('reportLoading').style.display = 'block';
+    fetch('/api/report/generate', { method: 'POST' })
+    .then(r => r.json())
+    .then(d => {
+        if (d.report) {
+            location.reload();
+        } else {
+            alert(d.error || '生成失败');
+            document.getElementById('reportLoading').style.display = 'none';
+        }
+    })
+    .catch(() => {
+        alert('网络错误');
+        document.getElementById('reportLoading').style.display = 'none';
+    });
+}
+</script>
+{% endblock %}

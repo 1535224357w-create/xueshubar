@@ -134,3 +134,13 @@ class ActivationCode(db.Model):
     used_at = db.Column(db.DateTime, nullable=True)
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+class Report(db.Model):
+    """AI 学习报告"""
+    __tablename__ = 'reports'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
