@@ -6,9 +6,26 @@ load_dotenv()
 
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
-    # 暂用 SQLite（PostgreSQL 后续再配置）
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///mathlearn.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # 数据库连接：优先 PostgreSQL，失败则 SQLite
+    @staticmethod
+    def _get_db_url():
+        raw = os.environ.get('DATABASE_URL', '')
+        if not raw:
+            db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'instance', 'mathlearn.db')
+            return f'sqlite:///{db_path}'
+        from urllib.parse import urlparse
+        if 'postgres' in raw:
+            raw = raw.replace('postgres://', 'postgresql://').replace('postgresql://', 'postgresql+psycopg2://')
+        try:
+            p = urlparse(raw)
+            if p.scheme and p.netloc:
+                return raw
+        except: pass
+        return 'sqlite:///mathlearn.db'
+
+    SQLALCHEMY_DATABASE_URI = _get_db_url()
 
     # AI API 配置
     DEEPSEEK_API_KEY = os.getenv('DEEPSEEK_API_KEY', '')
