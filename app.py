@@ -1165,32 +1165,26 @@ def init_database():
     if KnowledgePoint.query.first():
         return
 
-    # 一级知识点
-    kp1 = KnowledgePoint(name='一元微积分', description='极限、导数、积分')
-    kp2 = KnowledgePoint(name='多元微积分', description='偏导数、重积分、曲线曲面积分')
-    kp3 = KnowledgePoint(name='线性代数', description='矩阵、行列式、向量空间')
-    kp4 = KnowledgePoint(name='概率论与数理统计', description='概率、分布、统计推断')
-    kp5 = KnowledgePoint(name='常微分方程', description='一阶、二阶、高阶微分方程')
-
-    db.session.add_all([kp1, kp2, kp3, kp4, kp5])
+    # 一级分类（660题结构）
+    g1 = KnowledgePoint(name='高等数学', description='函数、极限、微积分、级数、微分方程')
+    g2 = KnowledgePoint(name='线性代数', description='行列式、矩阵、向量、方程组、二次型')
+    g3 = KnowledgePoint(name='概率论与数理统计', description='概率、分布、统计、估计')
+    db.session.add_all([g1, g2, g3])
     db.session.flush()
 
-    # 二级知识点
-    children = [
-        KnowledgePoint(name='极限', description='数列极限、函数极限', parent_id=kp1.id),
-        KnowledgePoint(name='导数与微分', description='求导法则、高阶导数', parent_id=kp1.id),
-        KnowledgePoint(name='不定积分', description='换元法、分部积分', parent_id=kp1.id),
-        KnowledgePoint(name='定积分', description='牛顿-莱布尼茨公式', parent_id=kp1.id),
-        KnowledgePoint(name='偏导数', description='多元函数求导', parent_id=kp2.id),
-        KnowledgePoint(name='重积分', description='二重积分、三重积分', parent_id=kp2.id),
-        KnowledgePoint(name='矩阵运算', description='矩阵乘法、逆矩阵', parent_id=kp3.id),
-        KnowledgePoint(name='行列式', description='行列式计算', parent_id=kp3.id),
-        KnowledgePoint(name='随机变量', description='离散型、连续型随机变量', parent_id=kp4.id),
-        KnowledgePoint(name='参数估计', description='点估计、区间估计', parent_id=kp4.id),
-        KnowledgePoint(name='一阶微分方程', description='可分离变量、齐次方程', parent_id=kp5.id),
-        KnowledgePoint(name='二阶微分方程', description='常系数线性方程', parent_id=kp5.id),
+    # 二级章节
+    chapters = [
+        (g1.id, '函数与极限'), (g1.id, '导数与微分'), (g1.id, '中值定理与导数应用'),
+        (g1.id, '不定积分'), (g1.id, '定积分'), (g1.id, '多元函数微分学'),
+        (g1.id, '重积分'), (g1.id, '曲线积分与曲面积分'),
+        (g1.id, '无穷级数'), (g1.id, '常微分方程'),
+        (g2.id, '行列式'), (g2.id, '矩阵'), (g2.id, '向量'),
+        (g2.id, '线性方程组'), (g2.id, '特征值与特征向量'), (g2.id, '二次型'),
+        (g3.id, '随机事件与概率'), (g3.id, '一维随机变量'), (g3.id, '多维随机变量'),
+        (g3.id, '随机变量的数字特征'), (g3.id, '大数定律与中心极限定理'), (g3.id, '数理统计'),
     ]
-    db.session.add_all(children)
+    for pid, name in chapters:
+        db.session.add(KnowledgePoint(name=name, parent_id=pid))
     db.session.commit()
 
 # 确保数据库初始化（本地和 Render 部署都生效）
