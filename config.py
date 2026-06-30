@@ -18,9 +18,9 @@ class Config:
         if not raw:
             print('[DB] 未设置DATABASE_URL，使用SQLite', file=sys.stderr)
             return 'sqlite:///mathlearn.db'
-        if 'ostgresql' in raw and 'postgresql' not in raw:
-            print(f'[DB] 警告：URL缺少p！原始值={repr(raw[:30])}', file=sys.stderr)
-            return 'sqlite:///mathlearn.db'
+        if 'ostgresql://' in raw:
+            raw = raw.replace('ostgresql://', 'postgresql+psycopg2://')
+            print(f'[DB] 修复缺少的p: {raw[:40]}...', file=sys.stderr)
         from urllib.parse import urlparse
         try:
             p = urlparse(raw)
