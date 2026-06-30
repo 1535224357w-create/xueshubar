@@ -127,7 +127,22 @@ function askQuestion() {
     }).then(function(r){return r.json()})
     .then(function(d){
         document.getElementById('askStatus').textContent = '';
-        box.innerHTML += '<div class="mb-2"><div class="bg-light rounded p-2 small">' + (d.answer || d.error) + '</div></div>';
+        var answer = d.answer || d.error || '';
+        var div = document.createElement('div');
+        div.className = 'mb-2';
+        div.innerHTML = '<div class="bg-light rounded p-2 small">' + answer + '</div>';
+        box.appendChild(div);
+        if (window.renderMathInElement) {
+            renderMathInElement(div, {
+                delimiters: [
+                    {left:'$$', right:'$$', display:true},
+                    {left:'$', right:'$', display:false},
+                    {left:'\\(', right:'\\)', display:false},
+                    {left:'\\[', right:'\\]', display:true}
+                ],
+                throwOnError: false
+            });
+        }
     });
 }
 </script>

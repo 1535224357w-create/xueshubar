@@ -785,7 +785,6 @@ def ask_ai():
         answer = claude_resp.choices[0].message.content
         answer = re.sub(r'[*_#>`~\\]', '', answer)
         answer = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', answer)
-        answer = re.sub(r'\${1,2}[^$]+\${1,2}', '', answer)
         answer = re.sub(r'\n{3,}', '\n\n', answer)
         return jsonify({'answer': answer.strip()})
     except Exception as e:

@@ -123,7 +123,13 @@ function askQuestion() {
     .then(function(d) {
         document.getElementById('askStatus').textContent = '';
         if (d.answer) {
-            box.innerHTML += '<div class="mb-2"><div class="bg-light rounded p-2 small">' + d.answer + '</div></div>';
+            var div = document.createElement('div');
+            div.className = 'mb-2';
+            div.innerHTML = '<div class="bg-light rounded p-2 small">' + d.answer + '</div>';
+            box.appendChild(div);
+            if (window.renderMathInElement) {
+                renderMathInElement(div, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});
+            }
         } else {
             box.innerHTML += '<div class="mb-2 text-danger small">' + (d.error || '失败') + '</div>';
         }
