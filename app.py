@@ -152,6 +152,17 @@ def upload_problem():
                 flash('免费用户每天只能上传 3 道题，开通会员可无限上传')
                 return redirect(url_for('vip_page'))
 
+        # 查重：如果内容相似的题已经在错题本中，不再重复添加
+        norm = content.strip().lower().replace(' ', '')
+        existing_ids = set()
+        for r in UserWrongProblem.query.filter_by(user_id=current_user.id):
+            if r.problem and r.problem.content.strip().lower().replace(' ', '') == norm:
+                existing_ids.add(r.problem_id)
+        if existing_ids:
+            pid = existing_ids.pop()
+            flash('这道题已经在你的错题本中了')
+            return redirect(url_for('problem_detail', problem_id=pid))
+
         # 先创建一个临时题目记录
         new_problem = Problem(
             content=content,
@@ -852,6 +863,20 @@ def generate_test():
         })
 
     return jsonify({'problems': result, 'total': len(result), 'weak_areas': top_kps})
+
+
+# ============ 删除错题记录 ============
+@app.route('/api/wrong/delete/<int:record_id>', methods=['POST'])
+@login_required
+def delete_wrong(record_id):
+    """从错题本删除一条记录"""
+    from models import UserWrongProblem
+    rec = db.session.get(UserWrongProblem, record_id)
+    if not rec or rec.user_id != current_user.id:
+        return jsonify({'error': '无权限'}), 403
+    db.session.delete(rec)
+    db.session.commit()
+    return jsonify({'success': True})
 
 
 # ============ 激活码系统 ============

@@ -41,13 +41,27 @@
                     <small class="text-muted">📌 {{ record.note }}</small>
                 </div>
                 {% endif %}
-                <a href="{{ url_for('problem_detail', problem_id=record.problem.id) }}"
-                   class="btn btn-sm btn-accent">查看解析 →</a>
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="{{ url_for('problem_detail', problem_id=record.problem.id) }}"
+                       class="btn btn-sm btn-accent">查看解析 →</a>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteRecord({{ record.id }})">删除</button>
+                </div>
             </div>
         </div>
     </div>
     {% endfor %}
 </div>
+<script>
+function deleteRecord(id) {
+    if (!confirm('确认删除这条错题记录？')) return;
+    fetch('/api/wrong/delete/' + id, {method:'POST'})
+    .then(function(r){return r.json()})
+    .then(function(d){
+        if (d.success) location.reload();
+        else alert(d.error || '删除失败');
+    });
+}
+</script>
 {% else %}
 <div class="empty-state">
     <div class="icon">📭</div>
