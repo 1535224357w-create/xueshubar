@@ -30,11 +30,12 @@ class User(UserMixin, db.Model):
 
     @property
     def is_vip(self):
-        """判断是否为 VIP 会员"""
+        """判断是否为 VIP 会员（管理员自动拥有所有权限）"""
+        if self.id == 1:
+            return True
         if not self.vip_expiry:
             return False
         from datetime import timezone
-        # 兼容带时区和不带时区的时间
         expiry = self.vip_expiry
         now = datetime.now(timezone.utc)
         if expiry.tzinfo is None:
