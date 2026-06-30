@@ -254,6 +254,12 @@ def upload_problem():
         # 更新上传计数
         if not current_user.is_vip:
             current_user.upload_count_today += 1
+
+        # 保存 AI 生成的答案和解析到题目记录
+        if solution:
+            new_problem.explanation = solution[:2000]
+        if answer_text:
+            new_problem.answer = answer_text[:500]
         db.session.commit()
 
         # 查找相似题
