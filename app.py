@@ -781,7 +781,13 @@ def ask_ai():
                 ]
             }]
         )
-        return jsonify({'answer': claude_resp.choices[0].message.content})
+        # 清理 markdown 符号
+        answer = claude_resp.choices[0].message.content
+        answer = re.sub(r'[*_#>`~\\]', '', answer)
+        answer = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', answer)
+        answer = re.sub(r'\${1,2}[^$]+\${1,2}', '', answer)
+        answer = re.sub(r'\n{3,}', '\n\n', answer)
+        return jsonify({'answer': answer.strip()})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
