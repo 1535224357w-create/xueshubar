@@ -714,7 +714,7 @@ def generate_report():
 @app.route('/api/ask', methods=['POST'])
 @login_required
 def ask_ai():
-    """AI 对话式追问"""
+    """AI 对话式追问：DeepSeek 先验答案 → Claude 教学引导"""
     if not current_user.is_vip:
         return jsonify({'error': '会员专享'}), 403
     data = request.get_json()
@@ -723,26 +723,50 @@ def ask_ai():
     if not question:
         return jsonify({'error': '请输入问题'}), 400
 
+    from openai import OpenAI
     ds_key = app.config.get('DEEPSEEK_API_KEY', '')
-    if not ds_key:
-        return jsonify({'error': 'AI 未配置'}), 500
+    claude_key = app.config.get('ANTHROPIC_API_KEY', '')
+    if not ds_key or not claude_key:
+        return jsonify({'error': 'AI 未完全配置'}), 500
 
     try:
-        from openai import OpenAI
-        client = OpenAI(api_key=ds_key, base_url=app.config['DEEPSEEK_BASE_URL'])
-        resp = client.chat.completions.create(
+        # 第一步：DeepSeek 给出正确答案
+        ds_client = OpenAI(api_key=ds_key, base_url=app.config['DEEPSEEK_BASE_URL'])
+        ds_resp = ds_client.chat.completions.create(
             model='deepseek-chat',
-            max_tokens=800,
-            timeout=30,
+            max_tokens=500,
+            timeout=20,
             messages=[{
-                'role': 'system',
-                'content': '你是一个数学辅导老师。用中文回答学生的问题，引导思考而不是直接给答案。'
-            }, {
                 'role': 'user',
-                'content': f'题目：{context}\n\n学生问：{question}'
+                'content': f'请解答这道数学题，给出最终答案。\n题目：{context}\n问题：{question}'
             }]
         )
-        return jsonify({'answer': resp.choices[0].message.content})
+        correct_answer = ds_resp.choices[0].message.content.strip()
+
+        # 第二步：Claude 参考正确答案进行教学引导
+        claude_client = OpenAI(api_key=claude_key, base_url=app.config['ANTHROPIC_BASE_URL'])
+        claude_resp = claude_client.chat.completions.create(
+            model='claude-haiku-4-5',
+            max_tokens=1000,
+            timeout=30,
+            messages=[{
+                'role': 'user',
+                'content': [
+                    {'type': 'text', 'text': (
+                        '你是一个耐心的高等数学辅导老师。用中文回答学生的问题。\n\n'
+                        f'题目：{context}\n'
+                        f'学生问：{question}\n\n'
+                        f'【参考答案（DeepSeek验证）】\n{correct_answer}\n\n'
+                        '教学要求：\n'
+                        '1. 参考答案已确认正确，你不需要重新计算\n'
+                        '2. 用引导式教学，先给提示让学生自己思考\n'
+                        '3. 如果学生明显困惑，再给出逐步解释\n'
+                        '4. 不要直接说"根据参考答案"，用你自己的话讲解'
+                    )}
+                ]
+            }]
+        )
+        return jsonify({'answer': claude_resp.choices[0].message.content})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
