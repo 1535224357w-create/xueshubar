@@ -93,4 +93,42 @@
         {% endif %}
     </div>
 </div>
+
+<!-- AI 追问 -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="mb-0 fw-bold">∇ AI 追问</h5>
+    </div>
+    <div class="card-body">
+        {% if current_user.is_vip %}
+        <div id="chatBox" class="mb-3" style="max-height:400px; overflow-y:auto;"></div>
+        <div class="input-group">
+            <input type="text" id="questionInput" class="form-control" placeholder="追问AI...">
+            <button class="btn btn-primary" onclick="askQuestion()">提问</button>
+        </div>
+        <div id="askStatus" class="mt-1 small text-muted"></div>
+        {% else %}
+        <p class="text-muted small mb-0"><a href="{{ url_for('vip_page') }}">开通会员</a>即可追问 AI</p>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function askQuestion() {
+    var q = document.getElementById('questionInput').value.trim();
+    if (!q) return;
+    document.getElementById('questionInput').value = '';
+    document.getElementById('askStatus').textContent = 'AI 思考中...';
+    var box = document.getElementById('chatBox');
+    box.innerHTML += '<div class="text-end mb-2"><span class="badge bg-light text-dark">你: ' + q + '</span></div>';
+    fetch('/api/ask', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({question: q, context: {{ problem.content|tojson|safe }}})
+    }).then(function(r){return r.json()})
+    .then(function(d){
+        document.getElementById('askStatus').textContent = '';
+        box.innerHTML += '<div class="mb-2"><div class="bg-light rounded p-2 small">' + (d.answer || d.error) + '</div></div>';
+    });
+}
+</script>
 {% endblock %}
