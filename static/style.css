@@ -261,6 +261,64 @@ main.container { flex: 1; padding-top: 1.25rem; padding-bottom: 3rem; max-width:
 }
 .animate-in { animation: fadeInUp .4s var(--ease) both; }
 
+/* ========== 知识树板块 ========== */
+.kp-category {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.2rem;
+  transition: all .3s var(--ease);
+}
+.kp-category:hover { box-shadow: 0 4px 16px rgba(0,0,0,.04); }
+.category-header { cursor: pointer; user-select: none; }
+.category-name { font-size: 1.1rem; }
+.category-header:hover .category-name { color: var(--primary); }
+.chapter-count { font-size: .7rem; padding: .15em .6em; }
+
+.chapter-card {
+  background: #f8f9fc;
+  border: 1px solid #eef0f5;
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  margin-bottom: .6rem;
+  transition: all .25s var(--ease);
+}
+.chapter-card:hover {
+  background: #fff;
+  border-color: var(--primary-light);
+  box-shadow: 0 2px 8px rgba(26,35,126,.04);
+}
+.chapter-name { font-size: .88rem; color: var(--text); }
+.chapter-desc { font-size: .78rem; color: var(--text-muted); line-height: 1.5; }
+.sub-topics { margin-top: .3rem; }
+.sub-topic-label { font-size: .72rem; color: var(--text-dim); }
+
+.practice-link {
+  flex-shrink: 0;
+  font-size: .72rem;
+  padding: .2rem .6rem;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.practice-link:hover { transform: translateY(-1px); }
+
+/* ========== 题目库板块标识 ========== */
+.problem-library-header {
+  border-bottom: 3px solid var(--primary);
+  padding-bottom: .8rem;
+  margin-bottom: 1.5rem;
+}
+.problem-library-header h2 { font-size: 1.3rem; font-weight: 700; }
+.problem-library-header .section-badge {
+  background: var(--primary);
+  color: #fff;
+  font-size: .65rem;
+  padding: .2rem .6rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
 /* ========== 响应式 ========== */
 @media (max-width: 768px) {
   .hero-title { font-size: 1.5rem; }

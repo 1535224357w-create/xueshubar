@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 {% block title %}题目库{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="problem-library-header d-flex justify-content-between align-items-center">
     <div>
-        <h2 class="fw-bold mb-1">≡ 题目库</h2>
-        <p class="text-muted mb-0">按知识点浏览系统题目，共 {{ problems|length }} 道</p>
+        <span class="section-badge">题目库</span>
+        <h2 class="fw-bold mb-0 mt-1">≡ 浏览题目</h2>
+        <p class="text-muted mb-0 small">从知识点体系中选题练习，共 {{ problems|length }} 道</p>
     </div>
 </div>
 
@@ -50,10 +51,15 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start mb-2">
                     <span class="badge badge-kp">{{ problem.knowledge_point.name }}</span>
-                    <span class="difficulty-stars">
-                        {% for _ in range(problem.difficulty) %}★{% endfor %}
-                        {% for _ in range(5 - problem.difficulty) %}☆{% endfor %}
-                    </span>
+                    <div>
+                        <span class="difficulty-stars">
+                            {% for _ in range(problem.difficulty) %}★{% endfor %}
+                            {% for _ in range(5 - problem.difficulty) %}☆{% endfor %}
+                        </span>
+                        {% if problem.source == '660' %}
+                        <span class="badge bg-secondary ms-1" style="font-size:.65rem;">660</span>
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="problem-content mb-3">
                     {{ problem.content }}

@@ -24,32 +24,25 @@
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint == 'knowledge_tree' %}active{% endif %}"
-                           href="{{ url_for('knowledge_tree') }}">知识树</a>
+                           href="{{ url_for('knowledge_tree') }}">⊦ 知识树</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint == 'problem_list' %}active{% endif %}"
-                           href="{{ url_for('problem_list') }}">题目库</a>
+                           href="{{ url_for('problem_list') }}">≡ 题目库</a>
                     </li>
-                    {% if current_user.is_authenticated %}
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle {% if request.endpoint in ('upload_problem', 'upload_photo') %}active{% endif %}"
+                        <a class="nav-link dropdown-toggle {% if request.endpoint in ('upload_problem', 'upload_photo', 'my_wrong_problems', 'practice_page', 'review_page') %}active{% endif %}"
                            href="#" role="button" data-bs-toggle="dropdown">
-                            上传错题
+                            学习工具
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{{ url_for('upload_problem') }}">⌨ 文本输入</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('upload_photo') }}">◉ 拍照上传</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('my_wrong_problems') }}">错题本</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('practice_page') }}">⊛ 刷题</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('review_page') }}">⊞ 回顾</a></li>
                         </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'my_wrong_problems' %}active{% endif %}"
-                           href="{{ url_for('my_wrong_problems') }}">错题本</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('practice_page') }}">⊛ 刷题</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('review_page') }}">⊞ 回顾</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('vip_page') }}">◆ 会员</a>
@@ -58,7 +51,6 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('admin_codes') }}">⊠ 激活码</a>
                     </li>
-                    {% endif %}
                     {% endif %}
                 </ul>
                 <ul class="navbar-nav">
