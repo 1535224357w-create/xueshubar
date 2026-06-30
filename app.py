@@ -1,5 +1,5 @@
 """高等数学学习网站 - 主程序"""
-import os
+import os, re
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from config import Config
@@ -242,6 +242,9 @@ def upload_problem():
                                     full = full.replace(tag, img_html)
                             else:
                                     full = full.replace(tag, '')
+                        # 清理残留的 PLOT 指令
+                        import re
+                        full = re.sub(r'【PLOT】.*?【/PLOT】', '', full)
                         if '【答案】' in full:
                             parts = full.split('【答案】')
                             solution = parts[0].strip()
@@ -255,9 +258,11 @@ def upload_problem():
         if not current_user.is_vip:
             current_user.upload_count_today += 1
 
-        # 保存 AI 生成的答案和解析到题目记录
+        # 保存 AI 生成的答案和解析到题目记录（清理残留指令）
         if solution:
-            new_problem.explanation = solution[:2000]
+            import re
+            clean_solution = re.sub(r'【PLOT】.*?【/PLOT】', '', solution)
+            new_problem.explanation = clean_solution[:2000]
         if answer_text:
             new_problem.answer = answer_text[:500]
         db.session.commit()
