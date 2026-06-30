@@ -8,21 +8,27 @@ class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    # 数据库连接：优先 PostgreSQL，失败则 SQLite
+    # 数据库连接
     @staticmethod
     def _get_db_url():
-        raw = os.environ.get('DATABASE_URL', '')
+        import sys
+        raw = os.environ.get('DATABASE_URL', '').strip()
+        print(f'[DB] DATABASE_URL raw: {repr(raw)}', file=sys.stderr)
+        print(f'[DB] DATABASE_URL len: {len(raw)}', file=sys.stderr)
         if not raw:
-            db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'instance', 'mathlearn.db')
-            return f'sqlite:///{db_path}'
+            print('[DB] 未设置DATABASE_URL，使用SQLite', file=sys.stderr)
+            return 'sqlite:///mathlearn.db'
+        if 'ostgresql' in raw and 'postgresql' not in raw:
+            print(f'[DB] 警告：URL缺少p！原始值={repr(raw[:30])}', file=sys.stderr)
+            return 'sqlite:///mathlearn.db'
         from urllib.parse import urlparse
-        if 'postgres' in raw:
-            raw = raw.replace('postgres://', 'postgresql://').replace('postgresql://', 'postgresql+psycopg2://')
         try:
             p = urlparse(raw)
             if p.scheme and p.netloc:
+                print(f'[DB] 使用PostgreSQL: {p.scheme}', file=sys.stderr)
                 return raw
         except: pass
+        print('[DB] URL无效，回退SQLite', file=sys.stderr)
         return 'sqlite:///mathlearn.db'
 
     SQLALCHEMY_DATABASE_URI = _get_db_url()
