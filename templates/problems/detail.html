@@ -76,4 +76,59 @@ function toggleAnswer() {
     section.style.display = section.style.display === 'none' ? 'block' : 'none';
 }
 </script>
+
+<!-- AI 追问 -->
+<div class="card mt-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold">∇ AI 追问</h5>
+        {% if not current_user.is_vip %}
+        <a href="{{ url_for('vip_page') }}" class="btn btn-sm btn-outline-warning">◆ 会员专享</a>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        {% if current_user.is_vip %}
+        <div id="chatBox" class="mb-3" style="max-height:400px; overflow-y:auto;"></div>
+        <div class="input-group">
+            <input type="text" id="questionInput" class="form-control"
+                   placeholder="追问... 如：为什么这里用洛必达？">
+            <button class="btn btn-primary" onclick="askQuestion()">提问</button>
+        </div>
+        <div id="askStatus" class="mt-1 small text-muted"></div>
+        {% else %}
+        <p class="text-muted small mb-0">开通会员即可追问 AI，深入理解每道题</p>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.getElementById('questionInput')?.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') askQuestion();
+});
+
+function askQuestion() {
+    var q = document.getElementById('questionInput').value.trim();
+    if (!q) return;
+    document.getElementById('questionInput').value = '';
+    document.getElementById('askStatus').textContent = 'AI 思考中...';
+
+    var box = document.getElementById('chatBox');
+    box.innerHTML += '<div class="text-end mb-2"><span class="badge bg-light text-dark">你: ' + q + '</span></div>';
+
+    fetch('/api/ask', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({question: q, context: {{ problem.content|tojson|safe }}})
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+        document.getElementById('askStatus').textContent = '';
+        if (d.answer) {
+            box.innerHTML += '<div class="mb-2"><div class="bg-light rounded p-2 small">' + d.answer + '</div></div>';
+        } else {
+            box.innerHTML += '<div class="mb-2 text-danger small">' + (d.error || '失败') + '</div>';
+        }
+        box.scrollTop = box.scrollHeight;
+    });
+}
+</script>
 {% endblock %}

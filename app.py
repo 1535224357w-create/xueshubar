@@ -710,6 +710,43 @@ def generate_report():
         return jsonify({'error': str(e)}), 500
 
 
+# ============ AI 追问 ============
+@app.route('/api/ask', methods=['POST'])
+@login_required
+def ask_ai():
+    """AI 对话式追问"""
+    if not current_user.is_vip:
+        return jsonify({'error': '会员专享'}), 403
+    data = request.get_json()
+    question = data.get('question', '').strip() if data else ''
+    context = data.get('context', '') if data else ''
+    if not question:
+        return jsonify({'error': '请输入问题'}), 400
+
+    ds_key = app.config.get('DEEPSEEK_API_KEY', '')
+    if not ds_key:
+        return jsonify({'error': 'AI 未配置'}), 500
+
+    try:
+        from openai import OpenAI
+        client = OpenAI(api_key=ds_key, base_url=app.config['DEEPSEEK_BASE_URL'])
+        resp = client.chat.completions.create(
+            model='deepseek-chat',
+            max_tokens=800,
+            timeout=30,
+            messages=[{
+                'role': 'system',
+                'content': '你是一个数学辅导老师。用中文回答学生的问题，引导思考而不是直接给答案。'
+            }, {
+                'role': 'user',
+                'content': f'题目：{context}\n\n学生问：{question}'
+            }]
+        )
+        return jsonify({'answer': resp.choices[0].message.content})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 # ============ 激活码系统 ============
 @app.route('/api/vip/activate', methods=['POST'])
 @login_required
