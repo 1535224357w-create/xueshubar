@@ -938,6 +938,97 @@ def generate_test():
     return jsonify({'problems': result, 'total': len(result), 'weak_areas': top_kps})
 
 
+# ============ 刷题模式 ============
+@app.route('/practice')
+@login_required
+def practice_page():
+    kps = KnowledgePoint.query.order_by(KnowledgePoint.name).all()
+    return render_template('practice.html', knowledge_points=kps)
+
+
+@app.route('/api/practice/start')
+@login_required
+def practice_start():
+    """获取刷题题目列表"""
+    kp_id = request.args.get('kp_id', type=int)
+    diff = request.args.get('difficulty', type=int)
+    limit = min(request.args.get('limit', 10, type=int), 50)
+
+    q = Problem.query.filter_by(source='system')
+    if kp_id:
+        q = q.filter_by(knowledge_point_id=kp_id)
+    if diff:
+        q = q.filter_by(difficulty=diff)
+
+    problems = q.order_by(db.func.random()).limit(limit).all()
+    return jsonify({'problems': [{
+        'id': p.id,
+        'content': p.content,
+        'difficulty': p.difficulty,
+        'kp_name': p.knowledge_point.name if p.knowledge_point else '综合',
+    } for p in problems]})
+
+
+@app.route('/api/practice/check', methods=['POST'])
+@login_required
+def practice_check():
+    """AI 判题"""
+    data = request.get_json()
+    pid = data.get('problem_id') if data else None
+    user_answer = (data.get('user_answer') or '').strip() if data else ''
+
+    problem = db.session.get(Problem, pid) if pid else None
+    if not problem:
+        return jsonify({'correct': False, 'analysis': '题目不存在'})
+
+    ds_key = app.config.get('DEEPSEEK_API_KEY', '')
+    if not ds_key:
+        return jsonify({'correct': False, 'analysis': 'AI 未配置'})
+
+    try:
+        from openai import OpenAI
+        client = OpenAI(api_key=ds_key, base_url=app.config['DEEPSEEK_BASE_URL'])
+        resp = client.chat.completions.create(
+            model='deepseek-chat',
+            max_tokens=600,
+            timeout=20,
+            messages=[{
+                'role': 'user',
+                'content': f'题目：{problem.content}\n标准答案：{problem.answer}\n学生答案：{user_answer}\n\n判断学生答案是否正确，给出分析。用以下JSON格式输出：\n{{"correct": true/false, "analysis": "分析"}}'
+            }]
+        )
+        import json, re
+        text = resp.choices[0].message.content
+        m = re.search(r'\{.*\}', text, re.DOTALL)
+        if m:
+            d = json.loads(m.group())
+            return jsonify({'correct': d.get('correct', False), 'analysis': d.get('analysis', '')})
+    except: pass
+    return jsonify({'correct': False, 'analysis': '判题失败'})
+
+
+@app.route('/api/practice/add-wrong', methods=['POST'])
+@login_required
+def practice_add_wrong():
+    """刷题后加入错题本"""
+    data = request.get_json()
+    pid = data.get('problem_id') if data else None
+    ans = (data.get('user_answer') or '').strip() if data else ''
+    problem = db.session.get(Problem, pid) if pid else None
+    if not problem:
+        return jsonify({'msg': '题目不存在'})
+
+    # 查重
+    for r in UserWrongProblem.query.filter_by(user_id=current_user.id):
+        if r.problem_id == pid:
+            return jsonify({'msg': '已在错题本中'})
+
+    w = UserWrongProblem(user_id=current_user.id, problem_id=pid, user_answer=ans)
+    db.session.add(w)
+    db.session.commit()
+    return jsonify({'msg': '已加入错题本'})
+
+
 # ============ 激活码系统 ============
 @app.route('/api/vip/activate', methods=['POST'])
 @login_required
