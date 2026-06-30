@@ -1014,42 +1014,39 @@ def check_order():
 
 # ============ 相似题推荐 ============
 def find_similar_problems(problem, limit=5):
+    """查找相似题（按知识点 + 内容去重）"""
     similar = []
     seen_ids = {problem.id}
+    seen_content = set()
+
+    kp_id = problem.knowledge_point_id
+    if kp_id <= 1:
+        return similar
+
     same_kp = Problem.query.filter(
-        Problem.knowledge_point_id == problem.knowledge_point_id,
+        Problem.knowledge_point_id == kp_id,
         Problem.id != problem.id
-    ).order_by(Problem.difficulty).limit(limit).all()
+    ).order_by(Problem.difficulty).limit(limit * 2).all()
     for p in same_kp:
-        similar.append(p)
-        seen_ids.add(p.id)
+        norm = p.content.strip().lower()[:60]
+        if norm not in seen_content:
+            similar.append(p)
+            seen_ids.add(p.id)
+            seen_content.add(norm)
+
     if len(similar) < limit:
-        current_kp = db.session.get(KnowledgePoint, problem.knowledge_point_id)
+        current_kp = db.session.get(KnowledgePoint, kp_id)
         if current_kp and current_kp.parent_id:
-            sibling_ids = [
-                c.id for c in KnowledgePoint.query.filter_by(parent_id=current_kp.parent_id).all()
-                if c.id != current_kp.id
-            ]
-            if sibling_ids:
-                siblings = Problem.query.filter(
-                    Problem.knowledge_point_id.in_(sibling_ids),
-                    ~Problem.id.in_(seen_ids)
-                ).order_by(Problem.difficulty).limit(limit - len(similar)).all()
-                for p in siblings:
-                    similar.append(p)
-                    seen_ids.add(p.id)
-    if len(similar) < limit and problem.tags:
-        for tag in problem.tags.split(','):
-            tag = tag.strip()
-            if not tag: continue
-            tag_matches = Problem.query.filter(
-                Problem.tags.contains(tag),
-                ~Problem.id.in_(seen_ids)
-            ).limit(limit - len(similar)).all()
-            for p in tag_matches:
-                similar.append(p)
-                seen_ids.add(p.id)
-            if len(similar) >= limit: break
+            sib_ids = [c.id for c in KnowledgePoint.query.filter_by(parent_id=current_kp.parent_id).all()
+                       if c.id != kp_id]
+            if sib_ids:
+                for p in Problem.query.filter(Problem.knowledge_point_id.in_(sib_ids),
+                                               ~Problem.id.in_(seen_ids)).order_by(Problem.difficulty).limit(limit*2).all():
+                    norm = p.content.strip().lower()[:60]
+                    if norm not in seen_content:
+                        similar.append(p)
+                        seen_ids.add(p.id)
+                        seen_content.add(norm)
     return similar[:limit]
 
 
