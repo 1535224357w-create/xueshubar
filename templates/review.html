@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}错题回顾{% endblock %}
+{% block content %}
+<div class="mb-4">
+    <h2 class="fw-bold mb-1">⊞ 错题回顾</h2>
+    <p class="text-muted mb-0">周错题集 + 智能月测试题</p>
+</div>
+
+<ul class="nav nav-tabs mb-4" id="reviewTab">
+    <li class="nav-item">
+        <a class="nav-link active" data-bs-toggle="tab" href="#weekly">周错题集</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#monthly">月测试题</a>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <!-- 周错题集 -->
+    <div class="tab-pane fade show active" id="weekly">
+        {% if weekly %}
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-muted small">最近 7 天共 {{ weekly|length }} 道错题</span>
+        </div>
+        <div class="row g-3">
+            {% for r in weekly %}
+            <div class="col-md-6">
+                <div class="card problem-card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="badge badge-kp">{{ r.problem.knowledge_point.name if r.problem.knowledge_point else '未分类' }}</span>
+                            <small class="text-muted">{{ r.created_at.strftime('%m-%d') }}</small>
+                        </div>
+                        <div class="problem-content small">{{ r.problem.content }}</div>
+                        {% if r.user_answer %}
+                        <div class="mt-2"><small class="text-danger">你的答案: {{ r.user_answer }}</small></div>
+                        {% endif %}
+                        <a href="{{ url_for('problem_detail', problem_id=r.problem.id) }}" class="btn btn-sm btn-outline-primary mt-2">查看</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state"><p class="text-muted">本周暂无错题记录</p></div>
+        {% endif %}
+    </div>
+
+    <!-- 月测试题 -->
+    <div class="tab-pane fade" id="monthly">
+        {% if monthly > 0 %}
+        <div class="card mb-4">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="fw-bold">薄弱知识点：</span>
+                    {% for kp, cnt in weak_kps[:3] %}
+                    <span class="badge bg-warning text-dark me-1">{{ kp }}（{{ cnt }}道错题）</span>
+                    {% endfor %}
+                </div>
+                <button class="btn btn-primary" onclick="generateTest()">生成月测试题</button>
+            </div>
+        </div>
+        <div id="testArea"></div>
+        {% else %}
+        <div class="empty-state"><p class="text-muted">暂无足够数据</p></div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function generateTest() {
+    var area = document.getElementById('testArea');
+    area.innerHTML = '<div class="text-center py-4"><div class="spinner-border"></div><p class="text-muted mt-2">正在生成测试题...</p></div>';
+
+    fetch('/api/review/generate-test', {method:'POST'})
+    .then(function(r){return r.json()})
+    .then(function(d){
+        if (d.problems) {
+            var html = '<div class="alert alert-info">基于你的薄弱知识点：' + d.weak_areas.join('、') + '，共' + d.total + '道题</div>';
+            d.problems.forEach(function(p){
+                html += '<div class="card mb-3"><div class="card-body">';
+                html += '<div class="d-flex justify-content-between"><span class="badge badge-kp">' + p.kp + '</span>';
+                html += '<span class="difficulty-stars">' + '★'.repeat(p.difficulty) + '</span></div>';
+                html += '<div class="problem-content my-2">' + p.content + '</div>';
+                html += '<button class="btn btn-sm btn-outline-success" onclick="this.nextElementSibling.style.display=\'block\';this.style.display=\'none\'">查看答案</button>';
+                html += '<div style="display:none" class="mt-2 p-2 bg-light rounded small">答案：' + p.answer + '</div>';
+                html += '</div></div>';
+            });
+            area.innerHTML = html;
+        } else {
+            area.innerHTML = '<div class="text-danger">' + (d.error || '生成失败') + '</div>';
+        }
+    })
+    .catch(function(){area.innerHTML = '<div class="text-danger">网络错误</div>'});
+}
+</script>
+{% endblock %}
