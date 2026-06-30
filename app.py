@@ -884,6 +884,60 @@ def delete_wrong(record_id):
     return jsonify({'success': True})
 
 
+# ============ 周错题集 & 月测试题 ============
+@app.route('/review')
+@login_required
+def review_page():
+    """错题回顾与测试"""
+    from datetime import datetime, timezone, timedelta
+    now = datetime.now(timezone.utc)
+    week_ago = now - timedelta(days=7)
+    weekly = UserWrongProblem.query.filter_by(user_id=current_user.id)\
+        .filter(UserWrongProblem.created_at >= week_ago)\
+        .order_by(UserWrongProblem.created_at.desc()).all()
+    month_ago = now - timedelta(days=30)
+    monthly = UserWrongProblem.query.filter_by(user_id=current_user.id)\
+        .filter(UserWrongProblem.created_at >= month_ago).all()
+    weak_kps = {}
+    for r in monthly:
+        if r.problem and r.problem.knowledge_point:
+            kp = r.problem.knowledge_point.name
+            weak_kps[kp] = weak_kps.get(kp, 0) + 1
+    weak_kps = sorted(weak_kps.items(), key=lambda x: x[1], reverse=True)
+    return render_template('review.html', weekly=weekly, monthly=len(monthly), weak_kps=weak_kps)
+
+
+@app.route('/api/review/generate-test', methods=['POST'])
+@login_required
+def generate_test():
+    """根据薄弱知识点生成月测试题"""
+    from datetime import datetime, timezone, timedelta
+    month_ago = datetime.now(timezone.utc) - timedelta(days=30)
+    records = UserWrongProblem.query.filter_by(user_id=current_user.id)\
+        .filter(UserWrongProblem.created_at >= month_ago).all()
+    weak = {}
+    for r in records:
+        if r.problem and r.problem.knowledge_point:
+            kp = r.problem.knowledge_point.name
+            weak[kp] = weak.get(kp, 0) + 1
+    top_kps = [k for k, v in sorted(weak.items(), key=lambda x: x[1], reverse=True)[:3]]
+    test_problems = []
+    seen = set()
+    for kp_name in top_kps:
+        kp = KnowledgePoint.query.filter_by(name=kp_name).first()
+        if kp:
+            for p in Problem.query.filter_by(knowledge_point_id=kp.id, source='system')\
+                    .order_by(Problem.difficulty).limit(3).all():
+                if p.id not in seen:
+                    test_problems.append(p)
+                    seen.add(p.id)
+    result = []
+    for i, p in enumerate(test_problems):
+        result.append({'num': i+1, 'content': p.content, 'answer': p.answer or '见解析',
+                       'kp': p.knowledge_point.name if p.knowledge_point else '综合', 'difficulty': p.difficulty})
+    return jsonify({'problems': result, 'total': len(result), 'weak_areas': top_kps})
+
+
 # ============ 激活码系统 ============
 @app.route('/api/vip/activate', methods=['POST'])
 @login_required
