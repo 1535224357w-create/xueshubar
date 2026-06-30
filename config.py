@@ -8,30 +8,8 @@ class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    # 数据库连接
-    @staticmethod
-    def _get_db_url():
-        import sys
-        raw = os.environ.get('DATABASE_URL', '').strip()
-        print(f'[DB] DATABASE_URL raw: {repr(raw)}', file=sys.stderr)
-        print(f'[DB] DATABASE_URL len: {len(raw)}', file=sys.stderr)
-        if not raw:
-            print('[DB] 未设置DATABASE_URL，使用SQLite', file=sys.stderr)
-            return 'sqlite:///mathlearn.db'
-        if 'ostgresql://' in raw:
-            raw = raw.replace('ostgresql://', 'postgresql+psycopg2://')
-            print(f'[DB] 修复缺少的p: {raw[:40]}...', file=sys.stderr)
-        from urllib.parse import urlparse
-        try:
-            p = urlparse(raw)
-            if p.scheme and p.netloc:
-                print(f'[DB] 使用PostgreSQL: {p.scheme}', file=sys.stderr)
-                return raw
-        except: pass
-        print('[DB] URL无效，回退SQLite', file=sys.stderr)
-        return 'sqlite:///mathlearn.db'
-
-    SQLALCHEMY_DATABASE_URI = _get_db_url()
+    # 数据库连接（Neon PostgreSQL）
+    SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://neondb_owner:npg_z7TGRjKn6rSQ@ep-floral-base-a6sp0u11.us-west-2.aws.neon.tech/neondb?sslmode=require'
 
     # AI API 配置
     DEEPSEEK_API_KEY = os.getenv('DEEPSEEK_API_KEY', '')
