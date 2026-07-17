@@ -1,9 +1,53 @@
 """高等数学学习网站 - 主程序"""
-import os, re
+import os, re, hmac, hashlib, base64
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from config import Config
 from models import db, User, KnowledgePoint, Problem, UserWrongProblem
+
+
+# ============ 激活码签名 ============
+_CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'  # 去掉易混淆 I O U 0 1
+
+
+def _sign_code_seed(seed):
+    """用 HMAC-SHA256 对种子签名，返回 4 字符 base32 签名"""
+    sig = hmac.new(
+        app.config['SECRET_KEY'].encode(),
+        seed.encode(),
+        hashlib.sha256
+    ).digest()[:3]  # 3 bytes → 24 bits → base32 编码后取前4字符
+    return base64.b32encode(sig).decode('ascii')[:4]
+
+
+def generate_activation_code():
+    """生成带签名的激活码，格式 XXXX-XXXX-XXXX"""
+    import secrets
+    seed = ''.join(secrets.choice(_CODE_CHARS) for _ in range(8))
+    sig = _sign_code_seed(seed)
+    return f'{seed[:4]}-{seed[4:]}-{sig}'
+
+
+def verify_code_signature(code):
+    """验证激活码格式和签名
+    - 新格式 XXXX-XXXX-XXXX：签名校验
+    - 旧格式 XXXX-XXXX：跳过签名验证（兼容存量码）
+    - 其他格式：拒绝
+    """
+    parts = code.split('-')
+    valid_chars = set(_CODE_CHARS)
+    def _valid(s): return len(s) == 4 and all(c in valid_chars for c in s)
+
+    if len(parts) == 3:
+        # 新格式：验证签名
+        if _valid(parts[0]) and _valid(parts[1]) and _valid(parts[2]):
+            seed = parts[0] + parts[1]
+            return parts[2] == _sign_code_seed(seed)
+        return False
+    elif len(parts) == 2:
+        # 旧格式 XXXX-XXXX：跳过签名验证（兼容存量码）
+        return _valid(parts[0]) and _valid(parts[1])
+    return False
 
 # ============ 初始化应用 ============
 app = Flask(__name__)
@@ -999,6 +1043,10 @@ def activate_code():
     from models import ActivationCode
     from datetime import datetime, timezone, timedelta
 
+    # 先校验签名/格式
+    if not verify_code_signature(code_str):
+        return jsonify({'success': False, 'msg': '激活码格式无效'})
+
     ac = ActivationCode.query.filter_by(code=code_str).first()
     if not ac:
         return jsonify({'success': False, 'msg': '激活码不存在'})
@@ -1044,8 +1092,7 @@ def gen_code():
     import secrets
     codes = []
     for _ in range(count):
-        code = ''.join(secrets.choice('ABCDEFGHJKLMNPQRSTUVWXYZ23456789') for _ in range(4))
-        code += '-' + ''.join(secrets.choice('ABCDEFGHJKLMNPQRSTUVWXYZ23456789') for _ in range(4))
+        code = generate_activation_code()  # 带签名的 XXXX-XXXX-XXXX 格式
         ac = ActivationCode(code=code, plan=plan, created_by=current_user.id)
         db.session.add(ac)
         codes.append(code)
