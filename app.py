@@ -135,9 +135,25 @@ def logout():
 # ============ 路由 - 知识树 ============
 @app.route('/knowledge')
 def knowledge_tree():
-    # 获取所有一级知识点
-    root_nodes = KnowledgePoint.query.filter_by(parent_id=None).all()
-    total_chapters = KnowledgePoint.query.filter(KnowledgePoint.parent_id.isnot(None)).count()
+    # 获取所有一级知识点（预计算所有数据，避免模板中懒加载 SQL）
+    root_nodes_q = KnowledgePoint.query.filter_by(parent_id=None).all()
+    root_nodes = []
+    for cat in root_nodes_q:
+        children = []
+        for ch in cat.children.order_by(KnowledgePoint.name).all():
+            children.append({
+                'id': ch.id,
+                'name': ch.name,
+                'description': ch.description,
+            })
+        root_nodes.append({
+            'id': cat.id,
+            'name': cat.name,
+            'description': cat.description,
+            'children': children,
+            'child_count': len(children),
+        })
+    total_chapters = sum(n['child_count'] for n in root_nodes)
     return render_template('knowledge/tree.html', root_nodes=root_nodes, total_chapters=total_chapters)
 
 @app.route('/api/knowledge/<int:kp_id>/children')
