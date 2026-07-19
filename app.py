@@ -137,7 +137,8 @@ def logout():
 def knowledge_tree():
     # 获取所有一级知识点
     root_nodes = KnowledgePoint.query.filter_by(parent_id=None).all()
-    return render_template('knowledge/tree.html', root_nodes=root_nodes)
+    total_chapters = KnowledgePoint.query.filter(KnowledgePoint.parent_id.isnot(None)).count()
+    return render_template('knowledge/tree.html', root_nodes=root_nodes, total_chapters=total_chapters)
 
 @app.route('/api/knowledge/<int:kp_id>/children')
 def get_knowledge_children(kp_id):
