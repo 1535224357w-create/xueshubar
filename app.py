@@ -1478,6 +1478,35 @@ def init_database():
         db.session.add(KnowledgePoint(name='第%d讲 %s' % (num, name),
                                        description=desc, parent_id=root30.id))
 
+    # ===== 张宇基础30讲（线代） =====
+    root_xd = KnowledgePoint(name='张宇基础30讲（线代）', description='张宇基础30讲·线性代数分册')
+    db.session.add(root_xd)
+    db.session.flush()
+    for name, desc in [
+        ('零基础课——线性代数入门', '向量基本概念、向量运算、线性变换'),
+        ('第1讲 行列式', '行列式的定义、性质、计算、克拉默法则'),
+        ('第2讲 矩阵', '矩阵运算、逆矩阵、秩、分块矩阵、初等变换'),
+        ('第3讲 向量组', '向量组线性相关性、秩、正交性'),
+        ('第4讲 线性方程组', '齐次与非齐次方程组解的结构、通解'),
+        ('第5讲 特征值与特征向量', '特征值特征向量、相似对角化、实对称矩阵'),
+        ('第6讲 二次型', '二次型标准形、正定二次型、合同变换'),
+    ]:
+        db.session.add(KnowledgePoint(name=name, description=desc, parent_id=root_xd.id))
+
+    # ===== 张宇基础30讲（概率） =====
+    root_gl = KnowledgePoint(name='张宇基础30讲（概率）', description='张宇基础30讲·概率论与数理统计分册')
+    db.session.add(root_gl)
+    db.session.flush()
+    for name, desc in [
+        ('第1讲 随机事件与概率', '事件运算、条件概率、全概率公式、贝叶斯公式、独立性'),
+        ('第2讲 一维随机变量及其分布', '分布函数、概率质量函数、概率密度函数、常见分布'),
+        ('第3讲 多维随机变量及其分布', '联合分布、边际分布、条件分布、独立性'),
+        ('第4讲 随机变量的数字特征', '数学期望、方差、协方差与相关系数'),
+        ('第5讲 大数定理与中心极限定理', '大数定律、中心极限定理'),
+        ('第6讲 数理统计', '样本分布、参数估计、假设检验'),
+    ]:
+        db.session.add(KnowledgePoint(name=name, description=desc, parent_id=root_gl.id))
+
     db.session.commit()
 
     # ===== 导入 1000 题题目 =====
