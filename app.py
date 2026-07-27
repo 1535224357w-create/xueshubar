@@ -1117,7 +1117,101 @@ def gen_code():
     return jsonify({'codes': codes})
 
 
-@app.route('/api/admin/reset-password', methods=['POST'])
+@app.route('/api/admin/seed-problems', methods=['POST'])
+@login_required
+def seed_1000_problems():
+    """远程导入1000题题目（仅管理员）"""
+    if current_user.id != 1:
+        return jsonify({'error': '无权限'}), 403
+
+    import json, re, os
+
+    json_path = os.path.join(os.path.dirname(__file__), '1000_problems_extracted.json')
+    if not os.path.exists(json_path):
+        return jsonify({'error': '种子数据文件不存在'})
+
+    with open(json_path, 'r', encoding='utf-8') as f:
+        raw_data = json.load(f)
+
+    # 知识点映射
+    KP_KW = {
+        '极限': '函数极限', '连续': '函数极限', '无穷小': '函数极限', '数列': '数列极限',
+        '导数': '微分学的概念', '求导': '微分学的概念', '可导': '微分学的概念', '微分': '微分学的概念',
+        '中值': '微分学的应用', '泰勒': '微分学的应用', '洛必达': '微分学的应用',
+        '单调': '微分学的应用', '极值': '微分学的应用', '最值': '微分学的应用', '凹凸': '微分学的应用',
+        '渐近': '微分学的应用', '曲率': '微分学的应用',
+        '不定积分': '积分学概念', '原函数': '积分学概念',
+        '定积分': '定积分', '换元': '定积分的计算', '分部积分': '定积分的计算',
+        '面积': '定积分的应用', '体积': '定积分的应用', '弧长': '定积分的应用',
+        '参数方程': '定积分的应用', '极坐标': '定积分的应用',
+        '多元': '多元函数微分学', '偏导': '多元函数微分学', '全微分': '多元函数微分学',
+        '二重积分': '二重积分',
+        '微分方程': '微分方程', '通解': '微分方程', '特解': '微分方程',
+        '级数': '无穷级数', '收敛': '无穷级数',
+        '向量': '向量', '矩阵': '矩阵', '行列式': '行列式',
+        '特征': '特征值与特征向量', '二次型': '二次型', '线性方程组': '线性方程组',
+        '概率': '随机事件与概率', '事件': '随机事件与概率', '分布': '一维随机变量',
+        '期望': '随机变量的数字特征', '方差': '随机变量的数字特征',
+        '正态': '一维随机变量', '参数估计': '参数估计', '假设检验': '参数估计',
+    }
+
+    root30 = KnowledgePoint.query.filter_by(name='张宇基础30讲（高数）').first()
+    lectures30 = {}
+    if root30:
+        for l in root30.children.all():
+            lectures30[l.name] = l.id
+
+    # 匹配知识点ID
+    def find_kp(content):
+        for kw, area in KP_KW.items():
+            if kw in content:
+                # 先在30讲里找
+                for lname, lid in lectures30.items():
+                    if area in lname:
+                        return lid
+                # 再到660树里找
+                kp = KnowledgePoint.query.filter(KnowledgePoint.name.contains(area)).first()
+                if kp:
+                    return kp.id
+        return None
+
+    imported = 0
+    skipped = 0
+
+    for batch_key, batch_text in raw_data.items():
+        text = batch_text.strip()
+        if text.startswith('```json'):
+            text = text[7:]
+        if text.endswith('```'):
+            text = text[:-3]
+        text = text.strip()
+        start = text.find('{')
+        end = text.rfind('}')
+        if start == -1 or end == -1:
+            continue
+        try:
+            data = json.loads(text[start:end+1])
+        except json.JSONDecodeError:
+            continue
+        for p in data.get('problems', []):
+            content = (p.get('content') or '').strip()
+            if not content:
+                skipped += 1
+                continue
+            opt = p.get('options') or ''
+            full = content + ('\n' + str(opt) if str(opt).strip() not in ('', 'None') else '')
+            if Problem.query.filter_by(content=full[:200]).first():
+                skipped += 1
+                continue
+            kp_id = find_kp(full) or (list(lectures30.values())[0] if lectures30 else None)
+            diff = 4 if '解答' in str(p.get('type')) else 3
+            tags = str(p.get('type', ''))
+            db.session.add(Problem(content=full, difficulty=diff,
+                                    knowledge_point_id=kp_id, source='system', tags=tags))
+            imported += 1
+
+    db.session.commit()
+    return jsonify({'imported': imported, 'skipped': skipped})
 def reset_admin_password():
     """重置管理员密码（仅开发调试用）"""
     try:
@@ -1334,14 +1428,13 @@ def init_database():
     if KnowledgePoint.query.first():
         return
 
-    # 一级分类（660题结构）
+    # ===== 660 知识树（高数/线代/概率） =====
     g1 = KnowledgePoint(name='高等数学', description='函数、极限、微积分、级数、微分方程')
     g2 = KnowledgePoint(name='线性代数', description='行列式、矩阵、向量、方程组、二次型')
     g3 = KnowledgePoint(name='概率论与数理统计', description='概率、分布、统计、估计')
     db.session.add_all([g1, g2, g3])
     db.session.flush()
 
-    # 二级章节
     chapters = [
         (g1.id, '函数与极限'), (g1.id, '导数与微分'), (g1.id, '中值定理与导数应用'),
         (g1.id, '不定积分'), (g1.id, '定积分'), (g1.id, '多元函数微分学'),
@@ -1354,6 +1447,37 @@ def init_database():
     ]
     for pid, name in chapters:
         db.session.add(KnowledgePoint(name=name, parent_id=pid))
+
+    # ===== 张宇基础30讲 知识树 =====
+    root30 = KnowledgePoint(name='张宇基础30讲（高数）',
+                            description='张宇基础30讲·高等数学分册（考研数学一/二/三通用）')
+    db.session.add(root30)
+    db.session.flush()
+
+    lectures_30 = [
+        (1, '函数极限与连续', '函数概念、极限定义与计算、无穷小、连续性、间断点'),
+        (2, '数列极限', '数列概念、数列极限定义与性质、单调有界准则'),
+        (3, '一元函数微分学的概念', '导数的定义与几何意义、可导性、高阶导数'),
+        (4, '一元函数微分学的应用（一）', '微分应用、中值定理、泰勒公式、洛必达'),
+        (5, '一元函数微分学的应用（二）', '函数单调性、极值与最值、凹凸性与拐点、渐近线'),
+        (6, '一元函数微分学的应用（三）', '中值定理综合、微分学几何/物理应用、曲率'),
+        (7, '一元函数积分学概念', '原函数与不定积分、积分公式、换元法与分部积分法'),
+        (8, '定积分的概念与性质', '定积分定义、性质、变限积分、牛顿-莱布尼茨公式'),
+        (9, '定积分的计算', '定积分计算方法、换元法、分部积分法、分段函数积分'),
+        (10, '定积分的应用（一）', '面积、体积、弧长、物理应用'),
+        (11, '定积分的应用（二）', '积分等式、积分不等式、证明题'),
+        (12, '定积分的应用（三）', '参数方程、极坐标方程的应用'),
+        (13, '多元函数微分学', '多元函数概念、偏导数、全微分、复合函数求导'),
+        (14, '二重积分', '二重积分概念、直角坐标与极坐标计算'),
+        (15, '微分方程', '一阶微分方程、可分离变量、齐次、线性、高阶线性'),
+        (16, '无穷级数', '级数概念、收敛性判定、正项级数、交错级数'),
+        (17, '多元函数微分学应用', '极值、条件极值与拉格朗日乘数法、梯度'),
+        (18, '隐函数与复合函数求导', '全微分条件、偏导数连续性、复合/隐函数求导'),
+    ]
+    for num, name, desc in lectures_30:
+        db.session.add(KnowledgePoint(name='第%d讲 %s' % (num, name),
+                                       description=desc, parent_id=root30.id))
+
     db.session.commit()
 
 # 确保数据库初始化（本地和 Render 部署都生效）
