@@ -1480,6 +1480,89 @@ def init_database():
 
     db.session.commit()
 
+    # ===== 导入 1000 题题目 =====
+    _seed_problems_from_json()
+
+
+def _seed_problems_from_json():
+    """从 JSON 文件导入 1000 题题目（仅在题目表为空时执行）"""
+    import json, os
+    if Problem.query.first():
+        return
+
+    json_path = os.path.join(os.path.dirname(__file__), '1000_problems_extracted.json')
+    if not os.path.exists(json_path):
+        return
+
+    with open(json_path, 'r', encoding='utf-8') as f:
+        raw_data = json.load(f)
+
+    KP_KW = {
+        '极限': '函数极限', '连续': '函数极限', '无穷小': '函数极限', '数列': '数列极限',
+        '导数': '微分学的概念', '求导': '微分学的概念', '可导': '微分学的概念',
+        '中值': '微分学的应用', '泰勒': '微分学的应用', '洛必达': '微分学的应用',
+        '单调': '微分学的应用', '极值': '微分学的应用', '最值': '微分学的应用',
+        '凹凸': '微分学的应用', '渐近': '微分学的应用', '曲率': '微分学的应用',
+        '不定积分': '积分学概念', '原函数': '积分学概念',
+        '定积分': '定积分', '换元': '定积分的计算', '分部积分': '定积分的计算',
+        '面积': '定积分的应用', '体积': '定积分的应用', '弧长': '定积分的应用',
+        '多元': '多元函数微分学', '偏导': '多元函数微分学', '全微分': '多元函数微分学',
+        '二重积分': '二重积分', '微分方程': '微分方程',
+        '级数': '无穷级数', '收敛': '无穷级数',
+    }
+
+    root30 = KnowledgePoint.query.filter_by(name='张宇基础30讲（高数）').first()
+    lecture_ids = {}
+    if root30:
+        for l in root30.children.all():
+            lecture_ids[l.name] = l.id
+
+    def find_kp(content):
+        for kw, area in KP_KW.items():
+            if kw in content:
+                for lname, lid in lecture_ids.items():
+                    if area in lname:
+                        return lid
+                return None
+        return None
+
+    first_lid = next(iter(lecture_ids.values()), None)
+    imported = 0
+
+    for batch_text in raw_data.values():
+        text = batch_text.strip()
+        for prefix in ['```json', '```']:
+            if text.startswith(prefix):
+                text = text[len(prefix):]
+        if text.endswith('```'):
+            text = text[:-3]
+        text = text.strip()
+        start, end = text.find('{'), text.rfind('}')
+        if start < 0 or end < 0:
+            continue
+        try:
+            data = json.loads(text[start:end+1])
+        except json.JSONDecodeError:
+            continue
+        for p in data.get('problems', []):
+            content = (p.get('content') or '').strip()
+            if not content:
+                continue
+            opt = p.get('options') or ''
+            full = content + ('\n' + str(opt) if str(opt).strip() not in ('', 'None') else '')
+            if Problem.query.filter_by(content=full[:200]).first():
+                continue
+            kp_id = find_kp(full) or first_lid
+            diff = 4 if '解答' in str(p.get('type')) else 3
+            db.session.add(Problem(content=full, difficulty=diff,
+                                    knowledge_point_id=kp_id, source='system',
+                                    tags=str(p.get('type', ''))))
+            imported += 1
+
+    db.session.commit()
+    if imported:
+        print(f'[DB] 已导入 {imported} 道 1000 题题目')
+
 # 确保数据库初始化（本地和 Render 部署都生效）
 try:
     with app.app_context():
