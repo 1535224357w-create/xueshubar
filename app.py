@@ -135,26 +135,35 @@ def logout():
 # ============ 路由 - 知识树 ============
 @app.route('/knowledge')
 def knowledge_tree():
-    # 获取所有一级知识点（预计算所有数据，避免模板中懒加载 SQL）
-    root_nodes_q = KnowledgePoint.query.filter_by(parent_id=None).all()
-    root_nodes = []
-    for cat in root_nodes_q:
-        children = []
-        for ch in cat.children.order_by(KnowledgePoint.name).all():
-            children.append({
-                'id': ch.id,
-                'name': ch.name,
-                'description': ch.description,
+    """三层知识树：大章 → 讲 → 知识点（纯知识展示，不含题目）"""
+    categories = []
+    total_lectures = 0
+    total_topics = 0
+
+    for cat in KnowledgePoint.query.filter_by(parent_id=None).order_by(KnowledgePoint.name).all():
+        lectures = []
+        for lecture in cat.children.order_by(KnowledgePoint.name).all():
+            topics = [{'id': t.id, 'name': t.name}
+                      for t in lecture.children.order_by(KnowledgePoint.name).all()]
+            lectures.append({
+                'id': lecture.id,
+                'name': lecture.name,
+                'topic_count': len(topics),
+                'topics': topics,
             })
-        root_nodes.append({
+            total_lectures += 1
+            total_topics += len(topics)
+
+        categories.append({
             'id': cat.id,
             'name': cat.name,
-            'description': cat.description,
-            'children': children,
-            'child_count': len(children),
+            'lectures': lectures,
         })
-    total_chapters = sum(n['child_count'] for n in root_nodes)
-    return render_template('knowledge/tree.html', root_nodes=root_nodes, total_chapters=total_chapters)
+
+    return render_template('knowledge/tree.html',
+                           categories=categories,
+                           total_lectures=total_lectures,
+                           total_topics=total_topics)
 
 @app.route('/api/knowledge/<int:kp_id>/children')
 def get_knowledge_children(kp_id):
@@ -1489,8 +1498,78 @@ def init_database():
 
     db.session.commit()
 
+    # ===== 创建第三层子知识点 =====
+    _seed_knowledge_subtopics()
+
     # ===== 导入 1000 题题目 =====
     _seed_problems_from_json()
+
+
+SUB_TOPICS = {
+    '第1讲 函数极限与连续': ['函数的概念与性质', '数列极限与函数极限', '极限的定义与计算',
+        '无穷小与无穷大', '极限的四则运算法则', '两个重要极限', '函数的连续性', '间断点的分类'],
+    '第2讲 数列极限': ['数列的概念', '数列极限的定义与性质', '数列极限存在的条件',
+        '单调有界数列收敛定理', '数列极限的计算'],
+    '第3讲 一元函数微分学的概念': ['导数的定义', '导数的几何意义', '函数的可导性与连续性',
+        '导数的计算法则', '高阶导数'],
+    '第4讲 一元函数微分学的应用（一）': ['微分的定义与应用', '罗尔定理', '拉格朗日中值定理',
+        '柯西中值定理', '泰勒公式', '洛必达法则'],
+    '第5讲 一元函数微分学的应用（二）': ['函数单调性的判定', '函数的极值', '函数的最值',
+        '曲线的凹凸性与拐点', '曲线的渐近线'],
+    '第6讲 一元函数微分学的应用（三）': ['中值定理的综合应用', '微分学在几何上的应用',
+        '微分学在物理上的应用', '曲率与曲率半径'],
+    '第7讲 一元函数积分学概念': ['原函数与不定积分的概念', '不定积分的性质',
+        '基本积分公式', '换元积分法', '分部积分法'],
+    '第8讲 定积分的概念与性质': ['定积分的概念', '定积分的性质', '变限积分函数', '牛顿-莱布尼茨公式'],
+    '第9讲 定积分的计算': ['定积分的换元法', '定积分的分部积分法', '分段函数的积分'],
+    '第10讲 定积分的应用（一）': ['平面图形的面积', '立体体积的计算', '曲线弧长的计算', '定积分的物理应用'],
+    '第11讲 定积分的应用（二）': ['积分等式的证明', '积分不等式', '利用定积分证明不等式'],
+    '第12讲 定积分的应用（三）': ['参数方程求导与积分', '极坐标方程的应用'],
+    '第13讲 多元函数微分学': ['多元函数的概念', '二元函数的极限与连续', '偏导数', '全微分',
+        '复合函数与隐函数求导法则'],
+    '第14讲 二重积分': ['二重积分的概念与性质', '二重积分的计算方法',
+        '直角坐标系中的计算', '极坐标系中的计算'],
+    '第15讲 微分方程': ['微分方程的基本概念', '可分离变量的微分方程', '齐次微分方程',
+        '一阶线性微分方程', '高阶线性微分方程'],
+    '第16讲 无穷级数': ['级数的基本概念', '级数的收敛性判定', '正项级数的判敛法', '交错级数的判敛法'],
+    '第17讲 多元函数微分学应用': ['多元函数的极值', '条件极值与拉格朗日乘数法', '梯度与方向导数'],
+    '第18讲 隐函数与复合函数求导': ['全微分存在的条件', '偏导数的连续性',
+        '复合函数求偏导', '隐函数求偏导'],
+    '零基础课——线性代数入门': ['向量的基本概念', '向量的线性运算', '线性变换初步'],
+    '第1讲 行列式': ['行列式的定义', '行列式的性质', '行列式的计算', '克拉默法则'],
+    '第2讲 矩阵': ['矩阵的运算', '逆矩阵', '矩阵的秩', '初等变换', '分块矩阵'],
+    '第3讲 向量组': ['向量组的线性相关性', '向量组的秩', '正交向量组', '施密特正交化'],
+    '第4讲 线性方程组': ['齐次线性方程组', '非齐次线性方程组', '基础解系', '通解结构'],
+    '第5讲 特征值与特征向量': ['特征值的定义与计算', '特征向量的性质',
+        '相似矩阵', '矩阵的对角化', '实对称矩阵'],
+    '第6讲 二次型': ['二次型的矩阵表示', '化二次型为标准形', '正定二次型', '合同变换'],
+    '第1讲 随机事件与概率': ['随机事件的概念与运算', '古典概率', '条件概率',
+        '乘法公式', '全概率公式', '贝叶斯公式', '事件的独立性'],
+    '第2讲 一维随机变量及其分布': ['随机变量的定义', '分布函数', '离散型随机变量',
+        '连续型随机变量', '常见分布'],
+    '第3讲 多维随机变量及其分布': ['二维随机变量的联合分布', '边缘分布',
+        '条件分布', '随机变量的独立性'],
+    '第4讲 随机变量的数字特征': ['数学期望', '方差', '协方差', '相关系数', '矩'],
+    '第5讲 大数定理与中心极限定理': ['大数定律', '中心极限定理'],
+    '第6讲 数理统计': ['样本与抽样分布', '参数的点估计', '区间估计', '假设检验'],
+}
+
+
+def _seed_knowledge_subtopics():
+    """创建第三层子知识点"""
+    idx = 0
+    for parent_name, sub_topics in SUB_TOPICS.items():
+        parent = KnowledgePoint.query.filter_by(name=parent_name).first()
+        if not parent:
+            continue
+        existing = {c.name for c in parent.children.all()}
+        for st in sub_topics:
+            if st not in existing:
+                db.session.add(KnowledgePoint(name=st, parent_id=parent.id))
+                idx += 1
+    if idx:
+        db.session.commit()
+        print(f'[DB] 已添加 {idx} 个子知识点')
 
 
 def _seed_problems_from_json():

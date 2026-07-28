@@ -2,79 +2,68 @@
 {% block title %}知识树{% endblock %}
 {% block content %}
 <div class="mb-4">
-    <h2 class="fw-bold mb-1">⊦ 数学知识树</h2>
-    <p class="text-muted mb-0">基于 2025 考研数学 660 题（数一）构建的知识体系</p>
+    <h2 class="fw-bold mb-1">⊦ 数学知识体系</h2>
+    <p class="text-muted mb-0">基于张宇基础30讲整理的知识点体系</p>
 </div>
 
 <div class="row g-4">
-    <!-- 左侧：知识树主体 -->
-    <div class="col-lg-8">
-        {% for node in root_nodes %}
+    <div class="col-lg-9">
+        {% for cat in categories %}
         <div class="kp-category mb-4 animate-in" style="animation-delay: {{ 0.1 * loop.index0 }}s;">
-            <div class="d-flex justify-content-between align-items-center category-header"
-                 onclick="toggleCategory('cat-{{ node.id }}')"
-                 data-category="{{ node.name }}">
-                <div>
-                    <h4 class="fw-bold mb-1 category-name">{{ node.name }}</h4>
-                    <small class="text-muted">{{ node.description }}</small>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-primary rounded-pill chapter-count">{{ node.child_count }} 章</span>
-                    <button class="btn btn-sm btn-outline-primary toggle-btn" id="toggle-cat-{{ node.id }}">
-                        ▼ 展开
-                    </button>
+            <div class="category-header" onclick="toggleCategory('cat-{{ cat.id }}')">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="fw-bold mb-0 category-name">{{ cat.name }}</h4>
+                    <button class="btn btn-sm btn-outline-primary toggle-btn" id="toggle-cat-{{ cat.id }}">▼ 展开</button>
                 </div>
             </div>
 
-            <div id="cat-{{ node.id }}" class="category-children mt-3" style="display: none;">
-                {% for child in node.children %}
+            <div id="cat-{{ cat.id }}" class="category-children mt-3" style="display: none;">
+                {% for lecture in cat.lectures %}
                 <div class="chapter-card">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div class="flex-grow-1">
-                            <h5 class="fw600 mb-1 chapter-name">{{ child.name }}</h5>
-                            <p class="chapter-desc mb-2">{{ child.description }}</p>
-                            <div class="sub-topics">
-                                <span class="sub-topic-label">核心知识点：</span>
-                            </div>
+                    <div class="lecture-header" onclick="toggleLecture('lec-{{ lecture.id }}')">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="fw600 mb-0 chapter-name">{{ lecture.name }}</h5>
+                            <small class="text-muted">{{ lecture.topic_count }} 个知识点</small>
                         </div>
-                        <a href="{{ url_for('problem_list', kp_id=child.id) }}"
-                           class="btn btn-sm btn-accent practice-link"
-                           title="去题目库练习该章节">
-                            → 练习
-                        </a>
+                    </div>
+                    <div id="lec-{{ lecture.id }}" class="topic-list mt-2" style="display: none;">
+                        {% for topic in lecture.topics %}
+                        <span class="topic-badge">{{ topic }}</span>
+                        {% endfor %}
                     </div>
                 </div>
-                {% else %}
-                <div class="text-muted small py-3 text-center">暂无章节数据</div>
                 {% endfor %}
             </div>
         </div>
         {% endfor %}
     </div>
 
-    <!-- 右侧：学习建议 -->
-    <div class="col-lg-4">
+    <div class="col-lg-3">
         <div class="card mb-3">
             <div class="card-body">
                 <h5 class="fw-bold">○ 学习路线</h5>
                 <ul class="small text-muted mb-0 ps-3" style="line-height: 2.2;">
-                    <li>按「高等数学 → 线性代数 → 概率论」顺序学习</li>
-                    <li>点击章节旁的 <span class="badge bg-accent" style="background:var(--accent);">→ 练习</span> 进入题目库</li>
-                    <li>建议先掌握基础概念，再刷题巩固</li>
-                    <li>错题会自动记录到错题本中</li>
+                    <li>点击大章展开查看各讲</li>
+                    <li>点击讲名称展开查看知识点</li>
+                    <li>建议按顺序系统学习</li>
+                    <li>学完知识点后去题目库练习</li>
                 </ul>
             </div>
         </div>
         <div class="card">
             <div class="card-body">
-                <h5 class="fw-bold">📊 学习统计</h5>
+                <h5 class="fw-bold">📊 统计</h5>
                 <div class="d-flex justify-content-between py-1">
                     <span class="text-muted small">知识板块</span>
-                    <span class="fw600">{{ root_nodes|length }}</span>
+                    <span class="fw600">{{ categories|length }}</span>
                 </div>
                 <div class="d-flex justify-content-between py-1">
-                    <span class="text-muted small">总章节</span>
-                    <span class="fw600">{{ total_chapters }}</span>
+                    <span class="text-muted small">总讲数</span>
+                    <span class="fw600">{{ total_lectures }}</span>
+                </div>
+                <div class="d-flex justify-content-between py-1">
+                    <span class="text-muted small">知识点数</span>
+                    <span class="fw600">{{ total_topics }}</span>
                 </div>
             </div>
         </div>
@@ -94,17 +83,26 @@ function toggleCategory(id) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    const params = new URLSearchParams(window.location.search);
-    const expand = params.get('expand');
-    if (expand) {
-        const el = document.getElementById('cat-' + expand);
-        const btn = document.getElementById('toggle-cat-' + expand);
-        if (el) {
-            el.style.display = 'block';
-            if (btn) btn.textContent = '▲ 收起';
-        }
-    }
-});
+function toggleLecture(id) {
+    const el = document.getElementById(id);
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
 </script>
+
+<style>
+.topic-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.topic-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #eef0ff;
+    color: var(--primary);
+    border-radius: 20px;
+    font-size: .78rem;
+    font-weight: 500;
+    transition: all .2s ease;
+}
+.topic-badge:hover { background: #dde0ff; transform: translateY(-1px); }
+.lecture-header { cursor: pointer; user-select: none; padding: 2px 0; }
+.lecture-header:hover .chapter-name { color: var(--primary); }
+</style>
 {% endblock %}
